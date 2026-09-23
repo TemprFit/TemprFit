@@ -1,7 +1,6 @@
 import { redirect } from 'next/navigation';
 import { getSessionUser } from '@/lib/auth';
 import { connectDB } from '@/lib/db';
-import User from '@/models/User';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,10 +12,8 @@ export default async function TrainerDashboardLayout({ children }) {
     redirect('/dashboard');
   }
 
-  // Double check approval status from DB to ensure it's up to date
-  const user = await User.findById(sessionUser._id).lean();
-  
-  if (!user?.trainerInfo?.isApproved) {
+  // Check approval status from session user
+  if (!sessionUser?.trainerInfo?.isApproved) {
     // If they somehow navigate here without approval, redirect them to trainee dashboard
     redirect('/dashboard?error=pending_approval');
   }

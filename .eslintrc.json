@@ -4,5 +4,38 @@
     "react/no-unescaped-entities": "warn",
     "react/jsx-no-undef": "warn",
     "@next/next/no-img-element": "warn"
-  }
+  },
+  "overrides": [
+    {
+      "files": [
+        "app/**/*.js",
+        "app/**/*.jsx",
+        "components/**/*.js",
+        "components/**/*.jsx"
+      ],
+      "excludedFiles": [
+        "app/api/**"
+      ],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": [
+                  "@/app/api/**",
+                  "**/app/api/**",
+                  "@/lib/api/**",
+                  "**/lib/api/**",
+                  "@/models/**",
+                  "**/models/**"
+                ],
+                "message": "Direct imports from app/api/**, lib/api/**, or models/** into UI code are prohibited. Only @/lib/contracts/** and @/lib/client/** are legal cross-boundary imports."
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
 }

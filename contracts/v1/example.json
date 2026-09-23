@@ -1,0 +1,49 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "/api/v1/example",
+  "description": "Example contract specification demonstrating the API contract boundary pattern",
+  "version": "1.0.0",
+  "method": "GET",
+  "endpoint": "/api/v1/example",
+  "request": {
+    "$ref": "#/definitions/request",
+    "definitions": {
+      "request": {
+        "type": "object",
+        "properties": {
+          "echo": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "$schema": "http://json-schema.org/draft-07/schema#"
+  },
+  "response": {
+    "$ref": "#/definitions/response",
+    "definitions": {
+      "response": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "ok",
+          "message",
+          "timestamp"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "$schema": "http://json-schema.org/draft-07/schema#"
+  }
+}

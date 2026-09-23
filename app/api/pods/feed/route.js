@@ -1,26 +1,20 @@
 import { NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
-import { cookies } from 'next/headers';
 import { connectDB } from '@/lib/db';
+import { getSessionUser } from '@/lib/auth';
 import Pod from '@/models/Pod';
 import WorkoutSession from '@/models/WorkoutSession';
 import User from '@/models/User';
 
-export async function GET(req) {
+export async function GET() {
   try {
-    const token = cookies().get('token')?.value;
-    if (!token) {
+    await connectDB();
+    const sessionUser = await getSessionUser();
+    if (!sessionUser) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if (!decoded || !decoded.userId) {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
-    }
 
-    await connectDB();
-    
     // Find pods the user is a member of
-    const userPods = await Pod.find({ members: decoded.userId });
+    const userPods = await Pod.find({ members: sessionUser._id });
     
     // Collect all unique member IDs from these pods
     const memberIds = new Set();

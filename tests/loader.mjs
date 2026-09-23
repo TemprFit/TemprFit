@@ -1,5 +1,5 @@
 import { resolve as pathResolve } from 'node:path';
-import { existsSync } from 'node:fs';
+import { existsSync, statSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 
 const ROOT_DIR = process.cwd();
@@ -19,7 +19,11 @@ export async function resolve(specifier, context, nextResolve) {
   if (specifier.startsWith('@/')) {
     const relativePath = specifier.slice(2);
     let target = pathResolve(ROOT_DIR, relativePath);
-    if (!existsSync(target)) {
+    if (existsSync(target) && statSync(target).isDirectory()) {
+      if (existsSync(pathResolve(target, 'index.js'))) {
+        target = pathResolve(target, 'index.js');
+      }
+    } else if (!existsSync(target)) {
       if (existsSync(target + '.js')) {
         target += '.js';
       } else if (existsSync(target + '.json')) {

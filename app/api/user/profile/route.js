@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { connectDB } from '@/lib/db'
-import { getSessionUser } from '@/lib/auth'
+import { getSessionUser, AUTH_COOKIE_NAME } from '@/lib/auth'
 import User from '@/models/User'
 
 const MAX_AVATAR_BYTES = 2 * 1024 * 1024 // 2MB, base64-encoded data URL
@@ -134,6 +134,6 @@ export async function DELETE() {
   await User.findByIdAndDelete(user._id)
 
   const response = NextResponse.json({ success: true })
-  response.cookies.delete('auth_token') // or AUTH_COOKIE_NAME if imported
+  response.cookies.delete(AUTH_COOKIE_NAME)
   return response
 }
