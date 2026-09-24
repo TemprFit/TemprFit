@@ -1,0 +1,179 @@
+.dashboardContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+@media (min-width: 768px) {
+  .dashboardContainer {
+    flex-direction: row;
+  }
+  .rootWidget {
+    flex: 2;
+  }
+  .sideWidgets {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+
+.rootWidget {
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+}
+
+.rootWidget h3 {
+  margin: 0 0 16px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.1rem;
+}
+
+.sideWidgets {
+  display: flex;
+  gap: 16px;
+}
+
+.smallWidget {
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.smallWidget h4 {
+  margin: 0 0 8px 0;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.widgetVal {
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+.transformationGrid {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.statBox {
+  background: var(--color-surface);
+  padding: 12px;
+  border-radius: var(--radius-md);
+  flex: 1;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.statLabel {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.statValue {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+.progressBarWrapper {
+  background: var(--color-surface);
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progressBarFill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.heatMapGrid {
+  display: flex;
+  justify-content: space-between;
+}
+
+.heatDay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.heatSquare {
+  width: 32px;
+  height: 32px;
+  background: #3b82f6;
+  border-radius: 4px;
+}
+
+.recoveryList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.recoveryRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.calendarGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+.calDay {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.waterControls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.waterControls button {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

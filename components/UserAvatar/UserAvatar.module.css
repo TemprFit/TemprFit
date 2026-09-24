@@ -1,0 +1,463 @@
+/* Base container */
+.container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.avatarImage {
+  border-radius: 50%;
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  z-index: 2; /* Keep above auras, below foreground effects */
+}
+
+.viewerOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease-out;
+  padding: 20px;
+}
+
+.viewerContent {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+  display: flex;
+  justify-content: center;
+  animation: zoomIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.viewerImg {
+  max-width: 100%;
+  max-height: 80vh;
+  object-fit: contain;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+
+.viewerClose {
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  background: rgba(0, 0, 0, 0.5);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  z-index: 2;
+}
+
+.viewerClose:hover {
+  background: rgba(0, 0, 0, 0.8);
+  transform: scale(1.1);
+}
+
+@media (max-width: 768px) {
+  .viewerClose {
+    top: 10px;
+    right: 10px;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes zoomIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+
+/* Base custom color ring */
+.container.hasCustomColor {
+  padding: 3px;
+  background-clip: content-box;
+  box-shadow: 0 0 10px var(--avatar-color), inset 0 0 5px var(--avatar-color);
+  border: 2px solid var(--avatar-color);
+}
+
+/* EFFECTS LAYERS */
+
+/* 1. Lightning Effect */
+@keyframes lightningFlash {
+  0%, 100% { filter: drop-shadow(0 0 4px #06b6d4); }
+  50% { filter: drop-shadow(0 0 12px #3b82f6) drop-shadow(0 0 15px #06b6d4); }
+}
+@keyframes sparkJump {
+  0% { transform: scale(1) rotate(0deg); opacity: 0; }
+  50% { transform: scale(1.3) rotate(15deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 0; }
+}
+
+.effectLightning {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px dashed #06b6d4;
+  animation: lightningFlash 0.5s infinite alternate;
+  z-index: 1;
+}
+.effectLightning::before, .effectLightning::after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: #fff;
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  animation: sparkJump 1.2s infinite;
+}
+.effectLightning::before { top: -5px; left: 20%; animation-delay: 0.1s; }
+.effectLightning::after { bottom: -5px; right: 20%; animation-delay: 0.6s; transform: rotate(180deg); }
+
+/* 2. Stars Orbit & Burst */
+@keyframes orbitStars {
+  0% { transform: rotate(0deg) translateX(calc(var(--orbit-radius) * 1px)) rotate(0deg) scale(0.8); opacity: 0.8; }
+  50% { opacity: 1; transform: rotate(180deg) translateX(calc(var(--orbit-radius) * 1px)) rotate(-180deg) scale(1.3); }
+  100% { transform: rotate(360deg) translateX(calc(var(--orbit-radius) * 1px)) rotate(-360deg) scale(0.8); opacity: 0.8; }
+}
+@keyframes starBurst {
+  0% { transform: scale(0); opacity: 0; }
+  50% { transform: scale(1.5); opacity: 1; }
+  100% { transform: scale(0); opacity: 0; }
+}
+
+.effectStars {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  z-index: 3;
+  pointer-events: none;
+}
+.effectStars .orbitItem {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -8px;
+  margin-left: -8px;
+  font-size: 16px;
+  animation: orbitStars var(--orbit-speed, 4s) linear infinite;
+  z-index: 3;
+}
+.effectStars .orbitItem:nth-child(2) { animation-delay: -2s; font-size: 14px; }
+.effectStars .burstItem {
+  position: absolute;
+  font-size: 12px;
+  animation: starBurst 2s infinite ease-out;
+}
+.effectStars .burstItem:nth-child(3) { top: -10px; left: 10%; animation-delay: 0.5s; }
+.effectStars .burstItem:nth-child(4) { bottom: -10px; right: 10%; animation-delay: 1.5s; }
+
+
+/* 3. Moon Orbit & Glow */
+@keyframes orbitMoons {
+  0% { transform: rotate(180deg) translateX(calc(var(--orbit-radius) * 1px)) rotate(-180deg) scale(0.8); opacity: 0.6; }
+  50% { opacity: 1; transform: rotate(360deg) translateX(calc(var(--orbit-radius) * 1px)) rotate(-360deg) scale(1.2); }
+  100% { transform: rotate(540deg) translateX(calc(var(--orbit-radius) * 1px)) rotate(-540deg) scale(0.8); opacity: 0.6; }
+}
+
+.effectMoon {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  box-shadow: 0 0 15px rgba(250, 204, 21, 0.4);
+  z-index: 3;
+  pointer-events: none;
+}
+.effectMoon .orbitItem {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -10px;
+  margin-left: -10px;
+  font-size: 20px;
+  animation: orbitMoons var(--orbit-speed, 5s) linear infinite;
+}
+.effectMoon .burstItem {
+  position: absolute;
+  font-size: 14px;
+  animation: starBurst 3s infinite ease-in-out;
+}
+.effectMoon .burstItem:nth-child(2) { top: 10%; right: -15px; animation-delay: 0.2s; }
+.effectMoon .burstItem:nth-child(3) { bottom: 10%; left: -15px; animation-delay: 1.2s; }
+
+/* 4. Fire Aura */
+@keyframes fireFlicker {
+  0% { box-shadow: 0 0 10px #ef4444, inset 0 0 10px #ef4444; }
+  50% { box-shadow: 0 0 20px #f97316, 0 0 15px #ef4444, inset 0 0 15px #f97316; }
+  100% { box-shadow: 0 0 10px #ef4444, inset 0 0 10px #ef4444; }
+}
+@keyframes emberRise {
+  0% { transform: translateY(0) scale(1); opacity: 1; }
+  100% { transform: translateY(-20px) scale(0.5); opacity: 0; }
+}
+.effectFire {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid #ef4444;
+  animation: fireFlicker 1s infinite alternate;
+  z-index: 1;
+}
+.effectFire .burstItem {
+  position: absolute;
+  font-size: 10px;
+  animation: emberRise 1.5s infinite ease-in;
+}
+.effectFire .burstItem:nth-child(1) { bottom: -5px; left: 20%; animation-delay: 0s; }
+.effectFire .burstItem:nth-child(2) { bottom: -5px; right: 20%; animation-delay: 0.7s; }
+
+/* 5. Gold Frame */
+@keyframes goldShine {
+  0% { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+.effectGold {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  background: linear-gradient(120deg, #fbbf24, #fef3c7, #fbbf24, #d97706, #fbbf24);
+  background-size: 200% auto;
+  animation: goldShine 3s linear infinite;
+  z-index: 1;
+  padding: 4px;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+.effectGold .burstItem {
+  position: absolute;
+  font-size: 14px;
+  animation: starBurst 2s infinite;
+}
+.effectGold .burstItem:nth-child(1) { top: -10px; left: -10px; animation-delay: 0s; }
+.effectGold .burstItem:nth-child(2) { bottom: -10px; right: -10px; animation-delay: 1s; }
+
+/* 6. Diamond */
+@keyframes icyPulse {
+  0%, 100% { box-shadow: 0 0 10px #38bdf8, inset 0 0 10px #38bdf8; border-color: #7dd3fc; }
+  50% { box-shadow: 0 0 25px #0284c7, inset 0 0 20px #0284c7; border-color: #bae6fd; }
+}
+.effectDiamond {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 3px solid #38bdf8;
+  animation: icyPulse 2s infinite ease-in-out;
+  z-index: 1;
+}
+
+/* 7. Rocket Fuel */
+@keyframes thrusterShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-1px) translateY(1px); }
+  75% { transform: translateX(1px) translateY(-1px); }
+}
+.effectRocket {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border-bottom: 4px solid #f97316;
+  border-top: 4px solid transparent;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  animation: thrusterShake 0.1s infinite;
+  z-index: 1;
+  box-shadow: 0 15px 15px -5px #f43f5e;
+}
+
+/* 8. Nebula */
+@keyframes cosmicSwirl {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.effectNebula {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, #c084fc, #e879f9, #2dd4bf, #c084fc);
+  animation: cosmicSwirl 4s linear infinite;
+  z-index: 1;
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #fff 0);
+  filter: blur(2px);
+}
+
+/* 9. Matrix */
+@keyframes matrixFall {
+  0% { transform: translateY(-10px); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateY(20px); opacity: 0; }
+}
+.effectMatrix {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  z-index: 3;
+  pointer-events: none;
+}
+.effectMatrix .burstItem {
+  position: absolute;
+  font-size: 10px;
+  color: #22c55e;
+  font-family: monospace;
+  animation: matrixFall 1.5s infinite linear;
+}
+.effectMatrix .burstItem:nth-child(1) { top: 0; left: 10%; animation-delay: 0s; }
+.effectMatrix .burstItem:nth-child(2) { top: 10%; right: 10%; animation-delay: 0.5s; }
+.effectMatrix .burstItem:nth-child(3) { top: -5px; left: 50%; animation-delay: 1s; }
+
+/* 10. Ocean */
+@keyframes waveRipple {
+  0% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.4); }
+  100% { box-shadow: 0 0 0 15px rgba(14, 165, 233, 0); }
+}
+.effectOcean {
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  border: 2px solid #0ea5e9;
+  animation: waveRipple 2s infinite;
+  z-index: 1;
+}
+
+/* 11. Plasma */
+@keyframes plasmaSpin {
+  0% { transform: rotate(0deg); border-color: #ec4899 #06b6d4 #ec4899 #06b6d4; }
+  100% { transform: rotate(360deg); border-color: #06b6d4 #ec4899 #06b6d4 #ec4899; }
+}
+.effectPlasma {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 3px solid;
+  animation: plasmaSpin 0.5s linear infinite;
+  z-index: 1;
+  box-shadow: 0 0 10px #ec4899;
+}
+
+/* 12. Sakura */
+@keyframes petalFall {
+  0% { transform: translateY(-10px) rotate(0deg); opacity: 0; }
+  25% { opacity: 1; }
+  100% { transform: translateY(20px) rotate(360deg); opacity: 0; }
+}
+.effectSakura {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  z-index: 3;
+  pointer-events: none;
+}
+.effectSakura .burstItem {
+  position: absolute;
+  font-size: 14px;
+  animation: petalFall 3s infinite linear;
+}
+.effectSakura .burstItem:nth-child(1) { top: -5px; left: 10%; animation-delay: 0s; }
+.effectSakura .burstItem:nth-child(2) { top: 5px; right: 10%; animation-delay: 1.5s; }
+
+/* 13. Glitch */
+@keyframes glitchStutter {
+  0% { transform: translate(0); }
+  20% { transform: translate(-2px, 2px); filter: hue-rotate(90deg); }
+  40% { transform: translate(-2px, -2px); filter: hue-rotate(0deg); }
+  60% { transform: translate(2px, 2px); filter: hue-rotate(180deg); }
+  80% { transform: translate(2px, -2px); filter: hue-rotate(0deg); }
+  100% { transform: translate(0); }
+}
+.effectGlitch {
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 2px solid #ef4444;
+  box-shadow: -2px 0 #3b82f6, 2px 0 #22c55e;
+  animation: glitchStutter 0.2s infinite;
+  z-index: 1;
+}
+
+/* 14. Toxic */
+@keyframes bubblePop {
+  0% { transform: scale(0.5) translateY(0); opacity: 0.8; }
+  100% { transform: scale(1.5) translateY(-15px); opacity: 0; }
+}
+.effectToxic {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 3px solid #84cc16;
+  box-shadow: 0 0 15px #65a30d;
+  z-index: 1;
+}
+.effectToxic .burstItem {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: #a3e635;
+  border-radius: 50%;
+  animation: bubblePop 2s infinite ease-in;
+}
+.effectToxic .burstItem:nth-child(1) { top: -5px; left: 30%; animation-delay: 0s; }
+.effectToxic .burstItem:nth-child(2) { bottom: 10px; right: -5px; animation-delay: 1s; }
+
+/* 15. Holy Light */
+@keyframes holyFloat {
+  0%, 100% { box-shadow: 0 -5px 20px #fef08a, 0 5px 20px #ffffff; }
+  50% { box-shadow: 0 -10px 30px #fde047, 0 10px 30px #ffffff; }
+}
+.effectHoly {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px solid #fef08a;
+  animation: holyFloat 3s infinite ease-in-out;
+  z-index: 1;
+}
+
+/* 16. Shadow Void */
+@keyframes shadowSwirl {
+  0% { transform: rotate(0deg) scale(1); opacity: 0.8; }
+  50% { transform: rotate(180deg) scale(1.1); opacity: 1; }
+  100% { transform: rotate(360deg) scale(1); opacity: 0.8; }
+}
+.effectShadow {
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, #18181b, #581c87, #18181b, #312e81, #18181b);
+  animation: shadowSwirl 5s infinite ease-in-out;
+  z-index: 0;
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 6px), #fff 0);
+  filter: blur(3px);
+}
+
+/* 17. Neon Pulse */
+@keyframes neonBeat {
+  0%, 100% { box-shadow: 0 0 10px #ec4899, inset 0 0 5px #ec4899; transform: scale(1); }
+  50% { box-shadow: 0 0 25px #f472b6, inset 0 0 15px #f472b6; transform: scale(1.05); }
+}
+.effectNeonPulse {
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  border: 2px solid #ec4899;
+  animation: neonBeat 1s infinite ease-in-out;
+  z-index: 1;
+}
