@@ -9,6 +9,7 @@ import {
   Salad, ScanFace, Heart, CalendarDays, Star, TrendingUp, Megaphone, Wallet, Shield, ChevronDown, ChevronRight, Zap, PanelLeftClose, PanelLeftOpen
 } from 'lucide-react';
 import { displayName } from '@/lib/utils';
+import UserAvatar from '@/components/UserAvatar';
 import styles from './Sidebar.module.css';
 
 import { traineeCategories, trainerCategories } from '@/lib/navConfig';
@@ -60,7 +61,7 @@ export default function Sidebar() {
 
     if (activeMode === 'trainee') {
       if (!user.trainerInfo?.isApproved) {
-        alert('Your trainer profile is pending admin approval. You cannot access the trainer dashboard yet.');
+        window.appAlert('Your trainer profile is pending admin approval. You cannot access the trainer dashboard yet.');
         return;
       }
       setActiveMode('trainer');
@@ -104,13 +105,7 @@ export default function Sidebar() {
 
       {user && (
         <Link href="/settings" className={styles.profile}>
-          <div className={`${styles.avatar} ${user.activeBorder ? `aura-avatar-${user.activeBorder}` : ''}`}>
-            {user.avatarUrl ? (
-              <img src={user.avatarUrl} alt={displayName(user)} style={{ borderRadius: '50%', width: '100%', height: '100%', objectFit: 'cover' }} />
-            ) : (
-              <span>{displayName(user)?.[0]?.toUpperCase() || '?'}</span>
-            )}
-          </div>
+          <UserAvatar user={user} size="md" />
           <div className={styles.profileInfo}>
             <span className={styles.profileName} style={{ color: user.activeColor || 'inherit' }}>{displayName(user)}</span>
             <Link href="/upgrade" onClick={(e) => e.stopPropagation()}>

@@ -34,12 +34,12 @@ export default function AdminExercises() {
       });
       
       if (res.ok) {
-        alert('Exercise added to global library!');
+        window.appAlert('Exercise added to global library!');
         setExerciseForm({ name: '', category: 'strength', muscleGroup: 'chest', instructions: '' });
         setImageFile(null);
       } else {
         const data = await res.json();
-        alert(data.error);
+        window.appAlert(data.error);
       }
     } catch (e) {}
     setActionLoading(false);

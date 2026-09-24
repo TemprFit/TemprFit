@@ -33,11 +33,35 @@ export function ToastProvider({ children }) {
     setToasts(prev => prev.filter(t => t.id !== id));
   };
 
-  // Override window.alert globally to use our beautiful toast
+  const [confirmData, setConfirmData] = useState(null);
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      window.alert = (msg) => {
-        showToast(msg);
+      window.appAlert = (msg) => showToast(msg, 'info');
+      
+      window.appConfirm = (msg) => {
+        return new Promise((resolve) => {
+          setConfirmData({
+            msg,
+            onConfirm: () => {
+              setConfirmData(null);
+              resolve(true);
+            },
+            onCancel: () => {
+              setConfirmData(null);
+              resolve(false);
+            }
+          });
+        });
+      };
+
+      window.appPrompt = (msg) => {
+        return new Promise((resolve) => {
+          // Fallback for prompt since it requires input, keeping it simple as a custom modal is complex for inputs
+          // We will use native prompt but styled later if needed. For now, use window._prompt or just fallback to confirm
+          const val = window.prompt(msg);
+          resolve(val);
+        });
       };
     }
   }, [showToast]);
@@ -69,6 +93,25 @@ export function ToastProvider({ children }) {
           </div>
         ))}
       </div>
+      
+      {/* Confirm Modal */}
+      {confirmData && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
+          <div style={{ background: 'var(--color-surface-elevated)', border: '1px solid var(--color-border)', borderRadius: '12px', padding: '24px', width: '90%', maxWidth: '400px', boxShadow: '0 20px 40px rgba(0,0,0,0.3)' }}>
+            <h3 style={{ marginTop: 0, marginBottom: '16px', fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <AlertCircle color="#ef4444" />
+              Confirmation Required
+            </h3>
+            <p style={{ color: 'var(--color-text-muted)', marginBottom: '24px', lineHeight: 1.5 }}>
+              {confirmData.msg}
+            </p>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+              <button onClick={confirmData.onCancel} style={{ padding: '8px 16px', borderRadius: '8px', background: 'transparent', border: '1px solid var(--color-border)', color: 'var(--color-text)', cursor: 'pointer' }}>Cancel</button>
+              <button onClick={confirmData.onConfirm} style={{ padding: '8px 16px', borderRadius: '8px', background: '#ef4444', border: 'none', color: '#fff', fontWeight: 'bold', cursor: 'pointer' }}>Confirm Action</button>
+            </div>
+          </div>
+        </div>
+      )}
     </ToastContext.Provider>
   );
 }

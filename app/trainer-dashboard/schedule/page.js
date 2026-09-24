@@ -55,7 +55,7 @@ export default function SchedulePage() {
         setShowModal(false);
         fetchData(); // Reload events
       } else {
-        alert(data.error);
+        window.appAlert(data.error);
       }
     } catch (e) {
       console.error(e);

@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Mic, MicOff, Volume2, VolumeX, Loader2, Sparkles, Bot } from 'lucide-react';
 import styles from './VoiceCoach.module.css';
 
-export default function VoiceCoach({ context = {}, autoSpeakPrompt = '' }) {
+export default function VoiceCoach({ context = {}, autoSpeakPrompt = '', syncKey = '' }) {
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -15,6 +15,11 @@ export default function VoiceCoach({ context = {}, autoSpeakPrompt = '' }) {
   const [availableVoices, setAvailableVoices] = useState([]);
   const [selectedVoiceURI, setSelectedVoiceURI] = useState('');
   const recognitionRef = useRef(null);
+  const latestSyncKey = useRef(syncKey);
+
+  useEffect(() => {
+    latestSyncKey.current = syncKey;
+  }, [syncKey]);
 
   useEffect(() => {
     // Initialize Web Speech API
@@ -28,7 +33,7 @@ export default function VoiceCoach({ context = {}, autoSpeakPrompt = '' }) {
       recognitionRef.current.onresult = async (event) => {
         const text = event.results[0][0].transcript;
         setTranscript(text);
-        await handleVoiceQuery(text);
+        await handleVoiceQuery(text, latestSyncKey.current);
       };
 
       recognitionRef.current.onerror = (event) => {
@@ -71,9 +76,9 @@ export default function VoiceCoach({ context = {}, autoSpeakPrompt = '' }) {
   // Handle active auto-speak triggers
   useEffect(() => {
     if (autoSpeakPrompt && supported && !isMuted) {
-      handleVoiceQuery(autoSpeakPrompt);
+      handleVoiceQuery(autoSpeakPrompt, syncKey);
     }
-  }, [autoSpeakPrompt, isMuted, supported]);
+  }, [autoSpeakPrompt, isMuted, supported, syncKey]);
 
   const toggleListen = () => {
     if (isListening) {
@@ -89,7 +94,7 @@ export default function VoiceCoach({ context = {}, autoSpeakPrompt = '' }) {
     }
   };
 
-  const handleVoiceQuery = async (query) => {
+  const handleVoiceQuery = async (query, currentKey) => {
     if (!query) return;
     setIsProcessing(true);
     try {
@@ -100,14 +105,18 @@ export default function VoiceCoach({ context = {}, autoSpeakPrompt = '' }) {
       });
       const data = await res.json();
       
-      if (data.reply) {
+      if (data.reply && latestSyncKey.current === currentKey) {
         speakResponse(data.reply);
       }
     } catch (e) {
       console.error(e);
-      speakResponse("Sorry, I had trouble connecting. Could you repeat that?");
+      if (latestSyncKey.current === currentKey) {
+        speakResponse("Sorry, I had trouble connecting. Could you repeat that?");
+      }
     }
-    setIsProcessing(false);
+    if (latestSyncKey.current === currentKey) {
+      setIsProcessing(false);
+    }
   };
 
   const speakResponse = (text) => {

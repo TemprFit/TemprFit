@@ -50,7 +50,7 @@ export default function EarningsPage() {
             <div className={styles.statInfo}>
               <h3>Wallet Balance</h3>
               <p className={styles.value}>${data.walletBalance.toFixed(2)}</p>
-              <button className={styles.withdrawBtn} onClick={() => alert('Withdrawal functionality coming in next phase!')}>
+              <button className={styles.withdrawBtn} onClick={() => window.appAlert('Withdrawal functionality coming in next phase!')}>
                 Withdraw Funds
               </button>
             </div>

@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server';
 import { askGemini } from '@/lib/gemini';
+import { connectDB } from '@/lib/db';
+import { getSessionUser } from '@/lib/auth';
+import { buildUserContext, getGoalBehavioralRules } from '@/lib/coach-context';
 
 export async function POST(request) {
   try {
@@ -7,6 +10,22 @@ export async function POST(request) {
     
     if (!query) {
       return NextResponse.json({ error: 'Query is required' }, { status: 400 });
+    }
+
+    // Pull real user data for grounded coaching
+    await connectDB();
+    const user = await getSessionUser();
+    let userDataBlock = '';
+    let goalRules = '';
+
+    if (user) {
+      try {
+        userDataBlock = await buildUserContext(user);
+        const primaryGoal = user.fitnessProfile?.primaryGoal || user.goal || 'general_health';
+        goalRules = getGoalBehavioralRules(primaryGoal);
+      } catch (e) {
+        userDataBlock = '(user history unavailable this turn)';
+      }
     }
 
     const systemPrompt = `
@@ -22,8 +41,12 @@ CRITICAL PERSONALITY INSTRUCTIONS:
 
 CRITICAL TIMING RULES:
 If the user tells you they have exactly 5 seconds left on a timer, you MUST literally say the countdown: "5... 4... 3... 2... 1... Go!"
+${goalRules}
 
-Workout Context:
+REAL USER DATA:
+${userDataBlock || '(no user data available)'}
+
+Current Workout Context:
 ${JSON.stringify(context, null, 2)}
 `;
 
@@ -42,3 +65,4 @@ ${JSON.stringify(context, null, 2)}
     return NextResponse.json({ error: 'Failed to process voice query' }, { status: 500 });
   }
 }
+

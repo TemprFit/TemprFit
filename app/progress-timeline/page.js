@@ -33,8 +33,8 @@ export default function ProgressTimeline() {
     }, 1500);
   };
 
-  const handleDelete = (id) => {
-    if(confirm('Delete this progress photo?')) {
+  const handleDelete = async (id) => {
+    if(await window.appConfirm('Delete this progress photo?')) {
       setPhotos(photos.filter(p => p.id !== id));
     }
   };

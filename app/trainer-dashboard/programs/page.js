@@ -27,17 +27,17 @@ export default function TrainerPrograms() {
   }, []);
 
   const handleDelete = async (id) => {
-    if (!confirm('Are you sure you want to delete this program?')) return;
+    if (!await window.appConfirm('Are you sure you want to delete this program?')) return;
     
     try {
       const res = await fetch(`/api/programs/${id}`, { method: 'DELETE' });
       if (res.ok) {
         setPrograms(programs.filter(p => p._id !== id));
       } else {
-        alert('Failed to delete program');
+        window.appAlert('Failed to delete program');
       }
     } catch (e) {
-      alert('Error deleting program');
+      window.appAlert('Error deleting program');
     }
   };
 

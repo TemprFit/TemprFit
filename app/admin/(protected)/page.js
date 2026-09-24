@@ -86,7 +86,7 @@ export default function AdminDashboard() {
   }, [tab]);
 
   const handleEscrowAction = async (transactionId, action) => {
-    if (!confirm(`Are you sure you want to ${action} this transaction?`)) return;
+    if (!await window.appConfirm(`Are you sure you want to ${action} this transaction?`)) return;
     const res = await fetch('/api/escrow', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -109,16 +109,16 @@ export default function AdminDashboard() {
       if (data.success) {
         router.push('/messages');
       } else {
-        alert(data.error || 'Failed to start chat');
+        window.appAlert(data.error || 'Failed to start chat');
       }
     } catch (e) {
       console.error(e);
-      alert('Network error while starting chat');
+      window.appAlert('Network error while starting chat');
     }
   };
 
   const handleDeleteUser = async (userId) => {
-    if (!confirm('Delete this user permanently? This cannot be undone.')) return;
+    if (!await window.appConfirm('Delete this user permanently? This cannot be undone.')) return;
     await fetch('/api/admin/users', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
@@ -141,7 +141,7 @@ export default function AdminDashboard() {
   };
 
   const handleContactUser = async (userId, username) => {
-    const message = prompt(`Enter message to send to ${username}:`);
+    const message = await window.appPrompt(`Enter message to send to ${username}:`);
     if (!message) return;
     
     const res = await fetch('/api/admin/contact', {
@@ -151,8 +151,8 @@ export default function AdminDashboard() {
     });
     
     const data = await res.json();
-    if (data.success) alert('Message sent successfully!');
-    else alert('Failed to send message: ' + (data.error || 'Unknown error'));
+    if (data.success) window.appAlert('Message sent successfully!');
+    else window.appAlert('Failed to send message: ' + (data.error || 'Unknown error'));
   };
 
   const handleCreateCoupon = async (e) => {
@@ -376,7 +376,7 @@ export default function AdminDashboard() {
                               body: JSON.stringify({ userId: u._id, updates: { isApproved: true } }),
                             });
                             if (res.ok) {
-                              alert('Trainer approved!');
+                              window.appAlert('Trainer approved!');
                               setUsers(prev => prev.map(user => user._id === u._id ? { ...user, trainerInfo: { ...user.trainerInfo, isApproved: true } } : user));
                             }
                           }}

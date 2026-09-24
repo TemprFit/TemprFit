@@ -32,7 +32,7 @@ export default function SessionsPage() {
   };
 
   const handleRelease = async (transactionId, milestoneId) => {
-    if (!confirm('Are you sure you want to release these funds to the trainer?')) return;
+    if (!await window.appConfirm('Are you sure you want to release these funds to the trainer?')) return;
     
     try {
       const res = await fetch(`/api/escrow/${transactionId}/release`, {
@@ -42,14 +42,14 @@ export default function SessionsPage() {
       });
       const data = await res.json();
       if (data.success) {
-        alert('Success! The funds have been released to your trainer.');
+        window.appAlert('Success! The funds have been released to your trainer.');
         fetchSessions(); // Refresh
       } else {
-        alert(data.error || 'We couldn\'t release the funds right now. Please try again later.');
+        window.appAlert(data.error || 'We couldn\'t release the funds right now. Please try again later.');
       }
     } catch (err) {
       console.error(err);
-      alert('We\'re having trouble connecting to the network right now. Please check your connection and try again!');
+      window.appAlert('We\'re having trouble connecting to the network right now. Please check your connection and try again!');
     }
   };
 

@@ -3,7 +3,7 @@ import { connectDB } from '@/lib/db'
 import { getSessionUser } from '@/lib/auth'
 import CoachMessage from '@/models/CoachMessage'
 import { askGemini, GeminiConfigError, GeminiRequestError } from '@/lib/gemini'
-import { buildUserContext, COACH_SYSTEM_PROMPT_HEADER } from '@/lib/coach-context'
+import { buildUserContext, COACH_SYSTEM_PROMPT_HEADER, getGoalBehavioralRules } from '@/lib/coach-context'
 
 export const dynamic = 'force-dynamic'
 
@@ -73,7 +73,10 @@ export async function POST(request) {
     contextBlock = '(Could not load user data this turn.)'
   }
 
-  const systemPrompt = `${COACH_SYSTEM_PROMPT_HEADER}\n\nREAL USER DATA:\n${contextBlock}`
+  const primaryGoal = user.fitnessProfile?.primaryGoal || user.goal || 'general_health'
+  const goalRules = getGoalBehavioralRules(primaryGoal)
+
+  const systemPrompt = `${COACH_SYSTEM_PROMPT_HEADER}\n${goalRules}\n\nREAL USER DATA:\n${contextBlock}`
 
   try {
     const reply = await askGemini({ systemPrompt, history: historyForModel, userMessage, attachment })

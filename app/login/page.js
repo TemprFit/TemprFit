@@ -147,10 +147,10 @@ function LoginForm() {
       if (res.ok) {
         setAppealSent(true);
       } else {
-        alert('Failed to submit appeal');
+        window.appAlert('Failed to submit appeal');
       }
     } catch (err) {
-      alert('Error submitting appeal');
+      window.appAlert('Error submitting appeal');
     }
     setLoading(false);
   };

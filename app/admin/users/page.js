@@ -52,7 +52,7 @@ export default function UserManagementPage() {
   };
 
   const handleUnban = async (userId) => {
-    if (!confirm('Are you sure you want to unban this user?')) return;
+    if (!await window.appConfirm('Are you sure you want to unban this user?')) return;
     try {
       const res = await fetch(`/api/admin/users/${userId}/ban`, {
         method: 'POST',
@@ -86,7 +86,7 @@ export default function UserManagementPage() {
         setBanReason('');
         setBanDuration('7');
       } else {
-        alert('Failed to ban user');
+        window.appAlert('Failed to ban user');
       }
     } catch (e) {
       console.error(e);
@@ -94,7 +94,7 @@ export default function UserManagementPage() {
   };
 
   const grantXP = async (userId) => {
-    const amount = parseInt(prompt('How much XP to grant? (e.g. 1000)'), 10);
+    const amount = parseInt(await window.appPrompt('How much XP to grant? (e.g. 1000)'), 10);
     if (!amount || isNaN(amount)) return;
     try {
       const res = await fetch('/api/admin/users/grant-xp', {
@@ -105,7 +105,7 @@ export default function UserManagementPage() {
       const data = await res.json();
       if (res.ok) {
         setUsers(users.map(u => u._id === userId ? { ...u, xp: data.newXP } : u));
-        alert(`Success! User now has ${data.newXP} XP.`);
+        window.appAlert(`Success! User now has ${data.newXP} XP.`);
       }
     } catch (e) {
       console.error(e);
@@ -113,7 +113,7 @@ export default function UserManagementPage() {
   };
 
   const grantBadge = async (userId) => {
-    const badgeId = prompt('Enter Badge ID (e.g., vip_gold, rocket_fuel):');
+    const badgeId = await window.appPrompt('Enter Badge ID (e.g., vip_gold, rocket_fuel):');
     if (!badgeId) return;
     try {
       const res = await fetch('/api/admin/users/grant-badge', {
@@ -123,9 +123,9 @@ export default function UserManagementPage() {
       });
       const data = await res.json();
       if (res.ok) {
-        alert(`Success! Granted badge ${data.badge.name}`);
+        window.appAlert(`Success! Granted badge ${data.badge.name}`);
       } else {
-        alert(`Error: ${data.error}`);
+        window.appAlert(`Error: ${data.error}`);
       }
     } catch (e) {
       console.error(e);

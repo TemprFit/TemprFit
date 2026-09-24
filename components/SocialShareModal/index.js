@@ -31,7 +31,7 @@ export default function SocialShareModal({ isOpen, onClose, stats }) {
     setSharingToMoments(true);
     setTimeout(() => {
       setSharingToMoments(false);
-      alert('Successfully shared and saved to your Moments!');
+      window.appAlert('Successfully shared and saved to your Moments!');
       onClose();
     }, 1200);
   };

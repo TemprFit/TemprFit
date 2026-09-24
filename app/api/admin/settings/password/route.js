@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import SystemConfig from '@/models/SystemConfig';
-import { getSessionUser } from '@/lib/auth';
+import { getSessionUser , verifyAdminToken } from '@/lib/auth';
 import { cookies } from 'next/headers';
 
 export async function POST(req) {
   await connectDB();
   const sessionUser = await getSessionUser();
-  const isAdminToken = cookies().get('admin_token')?.value === 'true';
+  const isAdminToken = (await verifyAdminToken());
 
   if (!isAdminToken && (!sessionUser || sessionUser.role !== 'admin')) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });

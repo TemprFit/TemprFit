@@ -34,7 +34,7 @@ export default function AdminCoupons() {
         setCouponForm({ code: '', planLevel: 'pro', expiresInDays: '' });
       } else {
         const data = await res.json();
-        alert(data.error);
+        window.appAlert(data.error);
       }
     } catch (e) {}
     setActionLoading(false);

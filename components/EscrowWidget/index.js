@@ -37,10 +37,10 @@ export default function EscrowWidget({ trainer }) {
       if (data.link) {
         window.location.href = data.link; // Redirect to Flutterwave
       } else {
-        alert(data.error || 'Payment failed to initialize.');
+        window.appAlert(data.error || 'Payment failed to initialize.');
       }
     } catch (err) {
-      alert('We\'re having trouble connecting to the network right now. Please check your connection and try again!');
+      window.appAlert('We\'re having trouble connecting to the network right now. Please check your connection and try again!');
     }
   };
 

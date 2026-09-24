@@ -42,7 +42,7 @@ export default function ProgramDetails() {
     e.preventDefault();
     const resolvedTrainerId = program.trainer?._id || (typeof program.trainer === 'string' ? program.trainer : null);
     if (!resolvedTrainerId) {
-      alert('Oops! It looks like this trainer\'s profile is no longer available. Please browse our marketplace for other amazing coaches!');
+      window.appAlert('Oops! It looks like this trainer\'s profile is no longer available. Please browse our marketplace for other amazing coaches!');
       return;
     }
     
@@ -63,11 +63,11 @@ export default function ProgramDetails() {
       if (res.ok && data.escrowId) {
         router.push(`/escrow/${data.escrowId}`);
       } else {
-        alert(data.error || 'We had a little trouble setting up your booking. Please try again!');
+        window.appAlert(data.error || 'We had a little trouble setting up your booking. Please try again!');
       }
     } catch (err) {
       console.error(err);
-      alert('We\'re having trouble connecting to the secure checkout. Please check your connection and try again!');
+      window.appAlert('We\'re having trouble connecting to the secure checkout. Please check your connection and try again!');
     } finally {
       setSubmittingBooking(false);
     }
@@ -87,16 +87,16 @@ export default function ProgramDetails() {
         })
       });
       if (res.ok) {
-        alert('Thank you! Your review has been posted successfully.');
+        window.appAlert('Thank you! Your review has been posted successfully.');
         setShowReviewModal(false);
         // refresh data
         window.location.reload();
       } else {
-        alert('We couldn\'t post your review right now. Please try again!');
+        window.appAlert('We couldn\'t post your review right now. Please try again!');
       }
     } catch (err) {
       console.error(err);
-      alert('We couldn\'t post your review right now. Please try again!');
+      window.appAlert('We couldn\'t post your review right now. Please try again!');
     } finally {
       setSubmittingReview(false);
     }

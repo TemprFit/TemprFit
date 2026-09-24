@@ -67,7 +67,7 @@ export default function MealPlanView({ plan }) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ title: `Meal Plan ${new Date().toISOString().slice(0, 10)}`, content: text })
         });
-        if (res.ok) alert('Awesome! Saved directly to your Notes.');
+        if (res.ok) window.appAlert('Awesome! Saved directly to your Notes.');
       }}>
         Save Plan to Notes
       </button>

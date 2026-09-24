@@ -14,6 +14,7 @@ import {
 import { useTheme } from '@/components/ThemeProvider';
 import { displayName } from '@/lib/utils';
 import BackButton from '@/components/BackButton';
+import UserAvatar from '@/components/UserAvatar';
 import styles from './Navbar.module.css';
 
 import { traineeCategories, trainerCategories } from '@/lib/navConfig';
@@ -172,7 +173,7 @@ export default function Navbar() {
 
     if (activeMode === 'trainee') {
       if (!user.trainerInfo?.isApproved) {
-        window.alert('Your trainer profile is pending admin approval. You cannot access the trainer dashboard yet.');
+        window.appAlert('Your trainer profile is pending admin approval. You cannot access the trainer dashboard yet.');
         return;
       }
       setActiveMode('trainer');
@@ -350,9 +351,7 @@ export default function Navbar() {
               ) : user ? (
                 <>
                   <button className={styles.userBtn} onClick={() => { setUserMenuOpen(!userMenuOpen); setNotifOpen(false); setSearchOpen(false); }}>
-                    <span className={styles.avatar}>
-                      {user.avatarUrl ? <img src={user.avatarUrl} alt={displayName(user)} className={styles.avatarImg} /> : <User size={16} />}
-                    </span>
+                    <UserAvatar user={user} size="sm" />
                     <span className={styles.userName}>{displayName(user).split(' ')[0] || 'Account'}</span>
                     <ChevronDown size={14} />
                   </button>

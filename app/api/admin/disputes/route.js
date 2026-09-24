@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
-import { getSessionUser } from '@/lib/auth';
+import { getSessionUser , verifyAdminToken } from '@/lib/auth';
 import Dispute from '@/models/Dispute';
 import Booking from '@/models/Booking';
 import User from '@/models/User';
@@ -12,7 +12,7 @@ export async function GET(request) {
     await connectDB();
     const user = await getSessionUser();
     const { cookies } = await import('next/headers');
-  if (!user || (user.role !== 'admin' && cookies().get('admin_token')?.value !== 'true')) {
+  if (!user || (user.role !== 'admin' && !(await verifyAdminToken()))) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -44,7 +44,7 @@ export async function PATCH(request) {
   try {
     await connectDB();
     const user = await getSessionUser();
-    if (!user || (user.role !== 'admin' && cookies().get('admin_token')?.value !== 'true')) {
+    if (!user || (user.role !== 'admin' && !(await verifyAdminToken()))) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

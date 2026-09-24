@@ -39,7 +39,7 @@ export default function EscrowManagement() {
   }, [id, router]);
 
   const handleRelease = async (milestoneId) => {
-    if (!confirm('Are you sure you want to release these funds? This action cannot be undone.')) return;
+    if (!await window.appConfirm('Are you sure you want to release these funds? This action cannot be undone.')) return;
     
     try {
       const res = await fetch(`/api/escrow/${id}/release`, {
@@ -51,17 +51,17 @@ export default function EscrowManagement() {
       
       if (res.ok) {
         setEscrow(data.transaction);
-        alert('Success! The funds have been released to your trainer.');
+        window.appAlert('Success! The funds have been released to your trainer.');
       } else {
-        alert(data.error || 'We couldn\'t release the funds right now. Please try again later.');
+        window.appAlert(data.error || 'We couldn\'t release the funds right now. Please try again later.');
       }
     } catch (err) {
-      alert('We\'re having trouble connecting to the network right now. Please check your connection and try again!');
+      window.appAlert('We\'re having trouble connecting to the network right now. Please check your connection and try again!');
     }
   };
 
   const handleDispute = () => {
-    alert("Dispute feature coming in next phase. Contact support in the meantime.");
+    window.appAlert("Dispute feature coming in next phase. Contact support in the meantime.");
   };
 
   if (loading || !escrow || !currentUser) {

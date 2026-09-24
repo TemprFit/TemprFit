@@ -65,14 +65,14 @@ export default function CheckoutPage() {
 
       const data = await res.json();
       if (res.ok) {
-        alert('Booking successful! Redirecting to your dashboard...');
+        window.appAlert('Booking successful! Redirecting to your dashboard...');
         router.push('/dashboard');
       } else {
-        alert(`Booking failed: ${data.error}`);
+        window.appAlert(`Booking failed: ${data.error}`);
       }
     } catch (e) {
       console.error(e);
-      alert('An error occurred during booking confirmation.');
+      window.appAlert('An error occurred during booking confirmation.');
     } finally {
       closePaymentModal();
     }
@@ -155,7 +155,7 @@ export default function CheckoutPage() {
               className={styles.payBtn}
               onClick={() => {
                 if (!user) {
-                  alert('Please log in first to complete booking.');
+                  window.appAlert('Please log in first to complete booking.');
                   router.push('/login');
                   return;
                 }

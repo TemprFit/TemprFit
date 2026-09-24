@@ -89,7 +89,7 @@ export default function OnboardingPage() {
       if (res.ok) {
         setStep(6); // Go to success screen
       } else {
-        alert('We couldn\'t save your profile right now. Please try again!');
+        window.appAlert('We couldn\'t save your profile right now. Please try again!');
         setLoading(false);
       }
     } catch (err) {
@@ -254,6 +254,17 @@ export default function OnboardingPage() {
                 />
               </div>
             </div>
+            <div className={styles.row}>
+              <div className={styles.inputGroup}>
+                <label>Target Weight (kg) {data.primaryGoal === 'general_health' ? '(Optional)' : ''}</label>
+                <input 
+                  type="number" 
+                  placeholder="e.g. 75"
+                  value={data.bodyMetrics.targetWeightKg}
+                  onChange={e => updateData('bodyMetrics', 'targetWeightKg', e.target.value)}
+                />
+              </div>
+            </div>
           </>
         );
       case 6: {
@@ -292,7 +303,8 @@ export default function OnboardingPage() {
   const isStepValid = () => {
     if (step === 1) return data.nickname && data.country;
     if (step === 5) {
-      const { age, biologicalSex, heightCm, currentWeightKg } = data.bodyMetrics;
+      const { age, biologicalSex, heightCm, currentWeightKg, targetWeightKg } = data.bodyMetrics;
+      if (data.primaryGoal !== 'general_health' && !targetWeightKg) return false;
       return age && biologicalSex && heightCm && currentWeightKg;
     }
     return true;

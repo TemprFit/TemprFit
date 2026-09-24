@@ -15,6 +15,9 @@ import HealthGraphs from '@/components/HealthGraphs';
 import DashboardMeals from '@/components/DashboardMeals';
 import MysteryBoxModal from '@/components/MysteryBoxModal';
 import WearablesSync from '@/components/WearablesSync';
+import ActivityHeatmap from '@/components/ActivityHeatmap';
+import { FatLossDashboard, HypertrophyDashboard, StrengthEnduranceDashboard, RecompDashboard, GeneralHealthDashboard } from '@/components/GoalWidgets';
+import { useRetentionNudges } from '@/hooks/useRetentionNudges';
 import { displayName } from '@/lib/utils';
 import styles from './page.module.css';
 
@@ -44,7 +47,7 @@ export default function Dashboard() {
       const data = await res.json();
       if (data.success) {
         setCheckedIn(true);
-        alert(`Daily check-in complete! You earned ${data.xpAward} XP. Streak: ${data.totalCheckInStreak} days. Total XP: ${data.xp}`);
+        window.appAlert(`Daily check-in complete! You earned ${data.xpAward} XP. Streak: ${data.totalCheckInStreak} days. Total XP: ${data.xp}`);
         if (user) {
           setUser({ 
             ...user, 
@@ -67,10 +70,10 @@ export default function Dashboard() {
           setShowMysteryBox(true);
         }
       } else {
-        alert(data.error || 'Whoops! We couldn\'t log your daily check-in. Give it another try!');
+        window.appAlert(data.error || 'Whoops! We couldn\'t log your daily check-in. Give it another try!');
       }
     } catch (e) {
-      alert('Whoops! We couldn\'t log your daily check-in. Give it another try!');
+      window.appAlert('Whoops! We couldn\'t log your daily check-in. Give it another try!');
     }
   };
 
@@ -136,6 +139,21 @@ export default function Dashboard() {
 
 
 
+  const sessionsGoal = stats?.goals?.weeklySessions || 4;
+  const sessionsThisWeek = stats?.sessionsThisWeek ?? 0;
+  const sessionsPct = Math.min(100, Math.round((sessionsThisWeek / sessionsGoal) * 100));
+
+  const targetWeight = stats?.goals?.targetWeight;
+  const currentBest1RM = stats?.currentBest1RM;
+  const liftPct =
+    targetWeight && currentBest1RM
+      ? Math.min(100, Math.round((currentBest1RM / targetWeight) * 100))
+      : null;
+
+  const primaryGoal = user?.fitnessProfile?.primaryGoal || 'general_health';
+
+  useRetentionNudges({ user, stats });
+
   if (!signedIn) {
     return (
       <div className={styles.page}>
@@ -150,19 +168,6 @@ export default function Dashboard() {
       </div>
     );
   }
-
-  const sessionsGoal = stats?.goals?.weeklySessions || 4;
-  const sessionsThisWeek = stats?.sessionsThisWeek ?? 0;
-  const sessionsPct = Math.min(100, Math.round((sessionsThisWeek / sessionsGoal) * 100));
-
-  const targetWeight = stats?.goals?.targetWeight;
-  const currentBest1RM = stats?.currentBest1RM;
-  const liftPct =
-    targetWeight && currentBest1RM
-      ? Math.min(100, Math.round((currentBest1RM / targetWeight) * 100))
-      : null;
-
-  const primaryGoal = user?.fitnessProfile?.primaryGoal || 'general_health';
 
   return (
     <div className={styles.page}>
@@ -211,32 +216,14 @@ export default function Dashboard() {
             </div>
           </div>
 
+          {/* Goal-Driven Dynamic Dashboard Engine */}
+          {primaryGoal === 'fat_loss' && <FatLossDashboard user={user} stats={stats} />}
+          {primaryGoal === 'hypertrophy' && <HypertrophyDashboard user={user} stats={stats} />}
+          {primaryGoal === 'strength_endurance' && <StrengthEnduranceDashboard user={user} stats={stats} />}
+          {primaryGoal === 'recomp' && <RecompDashboard user={user} stats={stats} />}
+          {primaryGoal === 'general_health' && <GeneralHealthDashboard user={user} stats={stats} />}
+
           <div className={styles.quickStats} data-tour="tour-quickstats">
-            {/* Adaptive re-ordering based on goal */}
-            {primaryGoal === 'fat_loss' || primaryGoal === 'general_health' ? (
-              <div className={styles.qsCard}>
-                <div className={styles.qsIcon} style={{ background: 'rgba(34,197,94,0.1)', color: '#22c55e' }}>
-                  <Flame size={22} />
-                </div>
-                <div>
-                  <span className={styles.qsValue}>{stats ? stats.caloriesThisWeek.toLocaleString() : '—'}</span>
-                  <span className={styles.qsLabel}>Est. Calories (7d)</span>
-                </div>
-              </div>
-            ) : null}
-
-            {primaryGoal === 'hypertrophy' || primaryGoal === 'strength_endurance' || primaryGoal === 'recomp' ? (
-              <div className={styles.qsCard}>
-                <div className={styles.qsIcon} style={{ background: 'rgba(59,130,246,0.1)', color: '#3b82f6' }}>
-                  <TrendingUp size={22} />
-                </div>
-                <div>
-                  <span className={styles.qsValue}>{stats ? stats.totalSessions : '—'}</span>
-                  <span className={styles.qsLabel}>Weekly Volume</span>
-                </div>
-              </div>
-            ) : null}
-
             <div className={styles.qsCard}>
               <div className={styles.qsIcon} style={{ background: 'rgba(6,182,212,0.1)', color: '#06b6d4' }}>
                 <Timer size={22} />
@@ -265,6 +252,8 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
+
+          <ActivityHeatmap data={stats?.activityHeatmap || []} days={84} />
 
           {stats && stats.totalSessions === 0 && (
             <div className={styles.emptyBanner}>

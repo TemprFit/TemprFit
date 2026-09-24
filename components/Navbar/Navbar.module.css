@@ -18,8 +18,9 @@
   height: 60px;
   gap: 20px;
   padding: 0 20px;
-  width: min(100%, 72rem);
+  width: min(92%, 1200px);
   margin: 0 auto;
+  box-sizing: border-box;
   background: var(--nav-pill-bg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -688,6 +689,11 @@
   padding: 8px;
   background: transparent;
   border: none;
+  flex-shrink: 0;
+  min-width: 44px;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
 }
 
 .mobileMenuOverlay {

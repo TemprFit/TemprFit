@@ -50,7 +50,7 @@ export default function Notes() {
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      alert('Your browser does not support voice input.');
+      window.appAlert('Your browser does not support voice input.');
       return;
     }
 
@@ -223,7 +223,7 @@ export default function Notes() {
                       navigator.share({ title: note.title, text: note.content });
                     } else {
                       navigator.clipboard.writeText(note.content);
-                      alert('Copied to clipboard');
+                      window.appAlert('Copied to clipboard');
                     }
                   }} title="Share">
                     <Share size={14} />
@@ -236,12 +236,12 @@ export default function Notes() {
                          body: JSON.stringify({ caption: `**${note.title}**\n\n${note.content}`, mediaUrl: '' })
                        });
                        if (res.ok) {
-                         alert('Note shared to Moments successfully!');
+                         window.appAlert('Note shared to Moments successfully!');
                        } else {
-                         alert('Failed to share to Moments.');
+                         window.appAlert('Failed to share to Moments.');
                        }
                      } catch (e) {
-                       alert('Error sharing to Moments.');
+                       window.appAlert('Error sharing to Moments.');
                      }
                   }} title="Share to Moments">
                     <Send size={14} />

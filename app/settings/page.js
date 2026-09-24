@@ -177,20 +177,20 @@ export default function SettingsPage() {
       const res = await fetch('/api/user/verify-email', { method: 'POST' });
       const data = await res.json();
       if (res.ok) {
-        alert('Awesome! Your email has been verified.');
+        window.appAlert('Awesome! Your email has been verified.');
         setUser(prev => ({ ...prev, emailVerified: true }));
       } else {
-        alert(data.error || 'We couldn\'t verify your email right now.');
+        window.appAlert(data.error || 'We couldn\'t verify your email right now.');
       }
     } catch (err) {
-      alert('We\'re having trouble connecting to the network right now. Please check your connection and try again!');
+      window.appAlert('We\'re having trouble connecting to the network right now. Please check your connection and try again!');
     } finally {
       setVerifyingEmail(false);
     }
   };
 
   const handleDeleteAccount = async () => {
-    if (!window.confirm("Are you sure? This will permanently delete your account, progress, and all data. This action cannot be undone.")) return;
+    if (!await window.appConfirm("Are you sure? This will permanently delete your account, progress, and all data. This action cannot be undone.")) return;
     try {
       const res = await fetch('/api/user/profile', { method: 'DELETE' });
       if (res.ok) {
@@ -205,7 +205,7 @@ export default function SettingsPage() {
   };
 
   const handleDeleteTrainerProfile = async () => {
-    if (!window.confirm("Are you sure you want to delete your trainer profile? You will lose access to the trainer dashboard and revert to a regular user. This action cannot be undone.")) return;
+    if (!await window.appConfirm("Are you sure you want to delete your trainer profile? You will lose access to the trainer dashboard and revert to a regular user. This action cannot be undone.")) return;
     try {
       const res = await fetch('/api/trainer/delete', { method: 'DELETE' });
       if (res.ok) {

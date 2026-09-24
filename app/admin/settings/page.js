@@ -59,7 +59,7 @@ export default function AdminSettings() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
-      alert('Settings saved!');
+      window.appAlert('Settings saved!');
     } catch (e) {
       setError(e.message || 'Failed to save settings');
     }
@@ -87,7 +87,7 @@ export default function AdminSettings() {
       });
       const data = await res.json();
       if (data.success) {
-        alert('Master password updated successfully! Please remember the new password.');
+        window.appAlert('Master password updated successfully! Please remember the new password.');
         setNewPassword('');
         setConfirmPassword('');
       } else {

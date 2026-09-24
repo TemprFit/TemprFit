@@ -101,18 +101,21 @@ export default function WorkoutSessionPage() {
   };
 
   const goNext = () => {
+    if (typeof window !== 'undefined' && window.speechSynthesis) window.speechSynthesis.cancel();
     if (currentIndex < session.exercises.length - 1) {
       setCurrentIndex(i => i + 1);
     }
   };
   
   const goPrev = () => {
+    if (typeof window !== 'undefined' && window.speechSynthesis) window.speechSynthesis.cancel();
     if (currentIndex > 0) {
       setCurrentIndex(i => i - 1);
     }
   };
 
   const finish = async () => {
+    if (typeof window !== 'undefined' && window.speechSynthesis) window.speechSynthesis.cancel();
     setFinishing(true);
     
     const payload = { exercises: session.exercises, id };
@@ -207,7 +210,12 @@ export default function WorkoutSessionPage() {
             <Trophy size={40} className={styles.summaryIcon} />
             <h1>Workout Complete</h1>
             <div className={styles.summaryStats}>
-              <div><Clock size={16} /> {Math.round(summary.session.durationSeconds / 60)} min</div>
+              <div>
+                <Clock size={16} /> 
+                {summary.session.durationSeconds < 60 
+                  ? `${summary.session.durationSeconds}s` 
+                  : `${Math.floor(summary.session.durationSeconds / 60)}m ${summary.session.durationSeconds % 60}s`}
+              </div>
               <div><Flame size={16} /> {summary.session.totalVolume} kg total volume</div>
               {summary.session.prCount > 0 && (
                 <div className={styles.prStat}><Trophy size={16} /> {summary.session.prCount} new PR{summary.session.prCount > 1 ? 's' : ''}!</div>
@@ -288,6 +296,7 @@ export default function WorkoutSessionPage() {
           <div style={{ margin: '20px 0' }}>
             <VoiceCoach 
               autoSpeakPrompt={autoSpeakPrompt}
+              syncKey={currentIndex}
               context={{
                 planName: session?.name,
                 currentExercise: current?.exercise?.name,

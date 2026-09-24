@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
-import { getSessionUser } from '@/lib/auth';
+import { getSessionUser , verifyAdminToken } from '@/lib/auth';
 import Notification from '@/models/Notification';
 import User from '@/models/User';
 
@@ -8,7 +8,7 @@ export async function POST(req) {
   await connectDB();
   const sessionUser = await getSessionUser();
   const { cookies } = await import('next/headers');
-  if (!sessionUser || (sessionUser.role !== 'admin' && cookies().get('admin_token')?.value !== 'true')) {
+  if (!sessionUser || (sessionUser.role !== 'admin' && !(await verifyAdminToken()))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
   }
 

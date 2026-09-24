@@ -24,15 +24,15 @@ export default function AdminNotifications() {
       });
       const data = await res.json();
       if (data.success) {
-        alert(`Successfully sent notification to ${data.count} users!`);
+        window.appAlert(`Successfully sent notification to ${data.count} users!`);
         setMessage('');
         setLink('');
       } else {
-        alert(data.error);
+        window.appAlert(data.error);
       }
     } catch (e) {
       console.error(e);
-      alert('Failed to send notifications.');
+      window.appAlert('Failed to send notifications.');
     }
     setLoading(false);
   };

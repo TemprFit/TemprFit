@@ -80,6 +80,17 @@ export async function GET() {
     .populate('exercise', 'name slug')
     .lean()
 
+  const activityHeatmap = [];
+  const heatmapMap = {};
+  completedSessions.forEach(s => {
+    if (!s.completedAt) return;
+    const dateStr = new Date(s.completedAt).toISOString().split('T')[0];
+    heatmapMap[dateStr] = (heatmapMap[dateStr] || 0) + 1;
+  });
+  for (const [date, count] of Object.entries(heatmapMap)) {
+    activityHeatmap.push({ date, count });
+  }
+
   return NextResponse.json({
     totalSessions: completedSessions.length,
     sessionsThisWeek: thisWeekSessions.length,
@@ -96,6 +107,7 @@ export async function GET() {
     targetExercise: targetExercise ? { name: targetExercise.name, slug: targetExercise.slug } : null,
     currentBest1RM,
     goals: user.goals || {},
+    activityHeatmap,
     recentPRs: recentPRs.map((p) => ({
       exerciseName: p.exercise?.name || 'Exercise',
       exerciseSlug: p.exercise?.slug,

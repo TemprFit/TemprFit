@@ -143,6 +143,7 @@ const UserSchema = new mongoose.Schema(
     totalCheckInStreak: { type: Number, default: 0 },
     longestCheckInStreak: { type: Number, default: 0 },
     unlockedColors: [{ type: String }],
+    unlockedBorders: [{ type: String }],
     activeColor: { type: String, default: '' },
     activeBorder: { type: String, default: '' },
     borderExpiresAt: { type: Date, default: null },

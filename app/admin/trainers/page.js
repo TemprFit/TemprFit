@@ -29,7 +29,7 @@ export default function AdminTrainers() {
 
   const handleApproval = async (trainerId, isApproved) => {
     const reason = rejectReason[trainerId] || '';
-    if (!isApproved && !reason) return alert('Please provide a reason for rejection.');
+    if (!isApproved && !reason) return window.appAlert('Please provide a reason for rejection.');
     
     try {
       const res = await fetch('/api/admin/trainers/approve', {
@@ -42,7 +42,7 @@ export default function AdminTrainers() {
         setRejectReason({ ...rejectReason, [trainerId]: '' });
       } else {
         const data = await res.json();
-        alert(data.error);
+        window.appAlert(data.error);
       }
     } catch (e) {}
   };

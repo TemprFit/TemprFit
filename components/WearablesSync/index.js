@@ -9,7 +9,7 @@ export default function WearablesSync() {
   const [metrics, setMetrics] = useState({ heartRate: '--', steps: '--', sleep: '--' });
 
   const handleSync = () => {
-    alert('Wearables integration (Apple Health & Google Fit) is coming soon in the next phase! Stay tuned.');
+    window.appAlert('Wearables integration (Apple Health & Google Fit) is coming soon in the next phase! Stay tuned.');
   };
 
   return (

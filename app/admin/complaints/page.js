@@ -41,7 +41,7 @@ export default function AdminComplaints() {
       }
     } catch (e) {
       console.error(e);
-      alert('Failed to perform action');
+      window.appAlert('Failed to perform action');
     }
   };
 

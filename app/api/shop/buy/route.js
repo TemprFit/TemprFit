@@ -42,10 +42,13 @@ export async function POST(req) {
       }
       user.activeColor = item.value;
     } else if (item.type === 'border') {
+      if (!user.unlockedBorders) {
+        user.unlockedBorders = [];
+      }
+      if (!user.unlockedBorders.includes(item.value)) {
+        user.unlockedBorders.push(item.value);
+      }
       user.activeBorder = item.value;
-      const expiry = new Date();
-      expiry.setDate(expiry.getDate() + item.durationDays);
-      user.borderExpiresAt = expiry;
     } else if (item.type === 'subscription') {
       user.plan = item.value;
       const expiry = new Date();
@@ -79,6 +82,7 @@ export async function POST(req) {
       plan: user.plan,
       planExpiresAt: user.planExpiresAt,
       unlockedColors: user.unlockedColors,
+      unlockedBorders: user.unlockedBorders,
       inventory: user.inventory,
       badges: user.badges
     });

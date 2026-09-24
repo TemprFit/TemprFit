@@ -68,7 +68,7 @@ export default function WorkoutsPage() {
   const handleNotePrompt = async (e, id, currentNote) => {
     e.preventDefault();
     e.stopPropagation();
-    const newNote = prompt('Enter a note for this workout:', currentNote || '');
+    const newNote = await window.appPrompt('Enter a note for this workout:', currentNote || '');
     if (newNote !== null) {
       try {
         const res = await fetch(`/api/workouts/${id}`, {

@@ -45,10 +45,10 @@ export default function BecomeTrainer() {
           setFormData({ ...formData, resumeUrl: result.fileUrl });
         }
       } else {
-        alert('Upload failed: ' + result.error);
+        window.appAlert('Upload failed: ' + result.error);
       }
     } catch (err) {
-      alert('Upload error');
+      window.appAlert('Upload error');
     } finally {
       setUploading(false);
     }
@@ -282,9 +282,9 @@ export default function BecomeTrainer() {
                     <button 
                       onClick={() => {
                         if (formData.payoutEmail.includes('@')) {
-                          alert(`Simulated Flutterwave connection successful for ${formData.payoutEmail}`);
+                          window.appAlert(`Simulated Flutterwave connection successful for ${formData.payoutEmail}`);
                         } else {
-                          alert('Please enter a valid email for the mock connect.');
+                          window.appAlert('Please enter a valid email for the mock connect.');
                         }
                       }}
                       style={{ background: '#6366f1', color: '#fff', padding: '10px 20px', borderRadius: '8px', border: 'none', fontWeight: 600, cursor: 'pointer' }}

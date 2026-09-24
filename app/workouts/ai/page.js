@@ -38,11 +38,11 @@ export default function AIWorkoutPage() {
         setPlan(data.plan);
         setHistory([data.plan, ...history]);
       } else {
-        alert(data.error || 'Your AI Coach couldn\'t generate the plan right now. Please try again!');
+        window.appAlert(data.error || 'Your AI Coach couldn\'t generate the plan right now. Please try again!');
       }
     } catch (e) {
       console.error(e);
-      alert('We\'re having trouble connecting to the network right now. Please check your connection and try again!');
+      window.appAlert('We\'re having trouble connecting to the network right now. Please check your connection and try again!');
     }
     setLoading(false);
   };
@@ -141,7 +141,7 @@ export default function AIWorkoutPage() {
                           content: JSON.stringify(plan, null, 2) 
                         })
                       });
-                      if (res.ok) alert('Awesome! Saved directly to your Notes.');
+                      if (res.ok) window.appAlert('Awesome! Saved directly to your Notes.');
                     } catch (e) {
                       console.error(e);
                     }

@@ -67,7 +67,7 @@ export default function TrainerProfile({ params }) {
             : (prev.followers || []).slice(0, -1)
         }));
       } else {
-        alert(data.error || 'We couldn\'t update your following list. Please try again!');
+        window.appAlert(data.error || 'We couldn\'t update your following list. Please try again!');
       }
     } catch (err) {
       console.error(err);
@@ -93,7 +93,7 @@ export default function TrainerProfile({ params }) {
           }
         }));
       } else {
-        alert(data.error || 'We couldn\'t update your likes. Please try again!');
+        window.appAlert(data.error || 'We couldn\'t update your likes. Please try again!');
       }
     } catch (err) {
       console.error(err);
@@ -126,11 +126,11 @@ export default function TrainerProfile({ params }) {
         setShowReviewModal(false);
         setReviewForm({ rating: 5, comment: '' });
       } else {
-        alert(data.error || 'We couldn\'t post your review right now. Please try again!');
+        window.appAlert(data.error || 'We couldn\'t post your review right now. Please try again!');
       }
     } catch (err) {
       console.error(err);
-      alert('We couldn\'t post your review right now. Please try again!');
+      window.appAlert('We couldn\'t post your review right now. Please try again!');
     }
     setSubmittingReview(false);
   };

@@ -25,7 +25,7 @@ export default function AdminModeration() {
   };
 
   const handleDeleteMoment = async (momentId) => {
-    if (!confirm('Are you sure you want to delete this moment?')) return;
+    if (!await window.appConfirm('Are you sure you want to delete this moment?')) return;
     try {
       const res = await fetch('/api/admin/moderation', {
         method: 'DELETE',

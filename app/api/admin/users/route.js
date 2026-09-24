@@ -1,8 +1,26 @@
 import { NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
+import { getSessionUser, verifyToken , verifyAdminToken } from '@/lib/auth';
+import { cookies } from 'next/headers';
 import User from '@/models/User';
 
 export const dynamic = 'force-dynamic';
+
+async function verifyAdmin() {
+  const sessionUser = await getSessionUser();
+  if (sessionUser && sessionUser.role === 'admin') {
+    return true;
+  }
+  const adminCookie = await verifyAdminToken() ? 'true' : null;
+  if (adminCookie) {
+    if (adminCookie === 'true') return true;
+    const payload = verifyToken(adminCookie);
+    if (payload && (payload.role === 'admin' || payload.isAdmin)) {
+      return true;
+    }
+  }
+  return false;
+}
 
 export async function GET(req) {
   await connectDB();

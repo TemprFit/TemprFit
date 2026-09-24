@@ -46,13 +46,13 @@ export default function SupportPage() {
         setSubject('');
         setMessage('');
         fetchComplaints();
-        alert('Complaint submitted successfully!');
+        window.appAlert('Complaint submitted successfully!');
       } else {
-        alert(data.error);
+        window.appAlert(data.error);
       }
     } catch (e) {
       console.error(e);
-      alert('Failed to submit complaint.');
+      window.appAlert('Failed to submit complaint.');
     }
     setLoading(false);
   };

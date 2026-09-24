@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
+import UserAvatar from '@/components/UserAvatar';
 import { BADGES } from '@/lib/badges';
 import { Activity, Flame, Medal, Star, Trophy } from 'lucide-react';
 import styles from './page.module.css';
@@ -63,14 +64,7 @@ export default function UserProfilePage() {
         <div className="container">
           
           <div className={`${styles.profileCard} ${profile.activeBorder ? `bg-effect-${profile.activeBorder}` : ''}`}>
-            <div className={`${styles.avatar} ${profile.activeBorder ? `aura-avatar-${profile.activeBorder}` : ''}`}>
-              {profile.avatarUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={profile.avatarUrl} alt={profile.username} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
-              ) : (
-                profile.username[0].toUpperCase()
-              )}
-            </div>
+            <UserAvatar user={profile} size="xl" disableLightbox={false} />
             
             <h1 
               className={styles.username}
