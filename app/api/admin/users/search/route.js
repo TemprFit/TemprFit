@@ -3,6 +3,7 @@ import { connectDB } from '@/lib/db';
 import { getSessionUser , verifyAdminToken } from '@/lib/auth';
 import User from '@/models/User';
 import { cookies } from 'next/headers';
+export const dynamic = 'force-dynamic';
 
 export async function GET(req) {
   try {

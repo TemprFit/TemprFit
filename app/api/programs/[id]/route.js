@@ -3,6 +3,7 @@ import { cookies } from 'next/headers';
 import { connectDB } from '@/lib/db';
 import TrainerProgram from '@/models/TrainerProgram';
 import { verifyToken, AUTH_COOKIE_NAME } from '@/lib/auth';
+export const dynamic = 'force-dynamic';
 
 export async function GET(request, { params }) {
   try {

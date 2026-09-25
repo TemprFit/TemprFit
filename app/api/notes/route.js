@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import { getSessionUser } from '@/lib/auth';
 import Note from '@/models/Note';
+export const dynamic = 'force-dynamic';
 
 export async function POST(req) {
   await connectDB();

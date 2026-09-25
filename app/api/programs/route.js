@@ -5,6 +5,7 @@ import TrainerProgram from '@/models/TrainerProgram';
 import User from '@/models/User';
 import Contract from '@/models/Contract';
 import { verifyToken, AUTH_COOKIE_NAME } from '@/lib/auth';
+export const dynamic = 'force-dynamic';
 
 export async function GET(request) {
   try {

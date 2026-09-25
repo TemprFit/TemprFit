@@ -3,6 +3,7 @@ import { connectDB } from '@/lib/db';
 import User from '@/models/User';
 import Notification from '@/models/Notification';
 import EscrowTransaction from '@/models/EscrowTransaction';
+export const dynamic = 'force-dynamic';
 
 const FLUTTERWAVE_SECRET_KEY = process.env.FLUTTERWAVE_SECRET_KEY || 'FLWSECK_TEST-dummy-key';
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';

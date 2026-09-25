@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import { getSessionUser } from '@/lib/auth';
 import MarketplaceItem from '@/models/MarketplaceItem';
+export const dynamic = 'force-dynamic';
 
 export async function GET(req) {
   try {

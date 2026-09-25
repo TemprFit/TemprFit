@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 import { connectDB } from '@/lib/db'
 import User from '@/models/User'
 import { verifyToken, AUTH_COOKIE_NAME } from '@/lib/auth'
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
   const adminToken = cookies().get('admin_token')?.value;
