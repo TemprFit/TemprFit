@@ -5,7 +5,6 @@ const nextConfig = {
     unoptimized: true,
     domains: ['images.unsplash.com', 'api.dicebear.com', 'img.spoonacular.com'],
   },
-  outputFileTracing: false,
 }
 
 const withPWA = require('next-pwa')({
