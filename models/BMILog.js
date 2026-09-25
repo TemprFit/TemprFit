@@ -8,7 +8,8 @@ const BMILogSchema = new mongoose.Schema(
     height: { type: Number, required: true }, // in cm
     bmi: { type: Number, required: true },
     category: { type: String, required: true },
-    advice: { type: String }
+    advice: { type: String },
+    notes: { type: String }
   },
   { timestamps: true }
 )

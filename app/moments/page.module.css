@@ -1,5 +1,5 @@
 .page {
-  padding: 0 20px 40px;
+  padding: 100px 20px 40px;
   min-height: 100vh;
   background-color: var(--color-background);
   color: var(--color-text);

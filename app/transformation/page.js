@@ -114,9 +114,14 @@ export default function TransformationPage() {
         }),
       });
       const data = await res.json();
-      if (res.ok) setAiFeedback(data.feedback);
+      if (res.ok) {
+        setAiFeedback(data.feedback);
+      } else {
+        setAiFeedback(data.error || 'Failed to analyze transformation.');
+      }
     } catch (err) {
       console.error(err);
+      setAiFeedback('Failed to analyze transformation.');
     } finally {
       setAnalyzing(false);
     }
@@ -140,6 +145,17 @@ export default function TransformationPage() {
     }
   };
 
+  const [history, setHistory] = useState([]);
+
+  useEffect(() => {
+    fetch('/api/transformation')
+      .then(res => res.json())
+      .then(data => {
+        if (data.transformations) setHistory(data.transformations);
+      })
+      .catch(console.error);
+  }, []);
+
   useEffect(() => {
     if (tagInputOpen && tagInputRef.current) {
       tagInputRef.current.focus();
@@ -159,6 +175,7 @@ export default function TransformationPage() {
           <button className={`${styles.tab} ${activeTab === 'upload' ? styles.active : ''}`} onClick={() => setActiveTab('upload')}>1. Upload</button>
           <button className={`${styles.tab} ${activeTab === 'tag' ? styles.active : ''}`} onClick={() => setActiveTab('tag')} disabled={!baseImage || !newImage}>2. Tag</button>
           <button className={`${styles.tab} ${activeTab === 'compare' ? styles.active : ''}`} onClick={() => setActiveTab('compare')} disabled={!baseImage || !newImage}>3. Compare</button>
+          <button className={`${styles.tab} ${activeTab === 'history' ? styles.active : ''}`} onClick={() => setActiveTab('history')}>History Map</button>
         </div>
       </div>
 
@@ -339,6 +356,33 @@ export default function TransformationPage() {
             </div>
           </div>
           
+        </div>
+      )}
+
+      {activeTab === 'history' && (
+        <div className={styles.historyMap}>
+          <h2>Your Transformation Journey</h2>
+          {history.length === 0 ? (
+            <p>You haven't saved any transformations yet.</p>
+          ) : (
+            <div className={styles.timeline}>
+              {history.map((item, index) => (
+                <div key={item._id} className={styles.timelineNode}>
+                  <div className={styles.timelineContent}>
+                    <div className={styles.timelineImages}>
+                      <img src={item.baseImage} alt="Before" />
+                      <img src={item.newImage} alt="After" />
+                    </div>
+                    <div className={styles.timelineDate}>
+                      {new Date(item.createdAt).toLocaleDateString()}
+                    </div>
+                    <p className={styles.timelineFeedback}>{item.aiFeedback}</p>
+                  </div>
+                  {index < history.length - 1 && <div className={styles.timelineArrow}>↓</div>}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>

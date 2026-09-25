@@ -3,6 +3,26 @@ import React, { useState } from 'react';
 import { Target, Activity, Droplets, Moon, Map, Zap, TrendingUp, Ruler } from 'lucide-react';
 import styles from './GoalWidgets.module.css';
 
+function WellnessWidgets() {
+  const [water, setWater] = useState(3);
+  return (
+    <>
+      <div className={styles.smallWidget}>
+        <h4><Droplets size={16} color="#3b82f6"/> Water Tracker</h4>
+        <div className={styles.waterControls}>
+          <button onClick={() => setWater(Math.max(0, water - 0.25))}>-</button>
+          <span style={{fontWeight: 'bold', fontSize: '1.2rem'}}>{water.toFixed(2)} L</span>
+          <button onClick={() => setWater(water + 0.25)}>+</button>
+        </div>
+      </div>
+      <div className={styles.smallWidget}>
+        <h4><Moon size={16} color="#a855f7" /> Sleep</h4>
+        <div className={styles.widgetVal}>7.5 <span style={{fontSize: '0.8rem', color: 'var(--color-text-muted)'}}>hrs</span></div>
+      </div>
+    </>
+  );
+}
+
 export function FatLossDashboard({ user, stats }) {
   const currentWt = user?.fitnessProfile?.bodyMetrics?.currentWeightKg || null;
   const targetWt = user?.fitnessProfile?.bodyMetrics?.targetWeightKg || null;
@@ -43,6 +63,7 @@ export function FatLossDashboard({ user, stats }) {
           <h4>Sessions This Week</h4>
           <div className={styles.widgetVal}>{stats?.sessionsThisWeek ?? '--'} <span style={{fontSize: '0.8rem', color: 'var(--color-text-muted)'}}>/ {stats?.goals?.weeklySessions || 4}</span></div>
         </div>
+        <WellnessWidgets />
       </div>
     </div>
   );
@@ -84,6 +105,7 @@ export function HypertrophyDashboard({ user, stats }) {
             )}
           </div>
         </div>
+        <WellnessWidgets />
       </div>
     </div>
   );
@@ -125,6 +147,7 @@ export function StrengthEnduranceDashboard({ user, stats }) {
           <h4>Total Sessions</h4>
           <div className={styles.widgetVal}>{stats?.totalSessions || 0}</div>
         </div>
+        <WellnessWidgets />
       </div>
     </div>
   );
@@ -167,40 +190,24 @@ export function RecompDashboard({ user, stats }) {
           <h4>Consistency</h4>
           <div className={styles.widgetVal} style={{color: '#a855f7'}}>{Math.max(stats?.currentStreak || 0, user?.totalCheckInStreak || 0)}d <span style={{fontSize: '0.8rem', color: 'var(--color-text-muted)'}}>streak</span></div>
         </div>
+        <WellnessWidgets />
       </div>
     </div>
   );
 }
 
 export function GeneralHealthDashboard({ user, stats }) {
-  const [water, setWater] = useState(3);
-
   return (
     <div className={styles.dashboardContainer}>
       <div className={styles.rootWidget}>
-        <h3><Map size={18} /> Consistency Calendar</h3>
-        <div className={styles.calendarGrid}>
-          {Array.from({ length: 14 }).map((_, i) => (
-            <div key={i} className={styles.calDay} style={{ background: i % 3 === 0 ? 'rgba(34,197,94,0.2)' : 'var(--color-surface)' }}>
-              {i + 1}
-            </div>
-          ))}
-        </div>
+        <h3><Map size={18} /> Health Overview</h3>
+        <p style={{fontSize: '0.85rem', color: 'var(--color-text-muted)', marginTop: '12px'}}>
+          Your primary focus is maintaining overall health and longevity.
+        </p>
       </div>
       
       <div className={styles.sideWidgets}>
-        <div className={styles.smallWidget}>
-          <h4><Droplets size={16} color="#3b82f6"/> Water Tracker</h4>
-          <div className={styles.waterControls}>
-            <button onClick={() => setWater(Math.max(0, water - 1))}>-</button>
-            <span style={{fontWeight: 'bold', fontSize: '1.2rem'}}>{water} L</span>
-            <button onClick={() => setWater(water + 1)}>+</button>
-          </div>
-        </div>
-        <div className={styles.smallWidget}>
-          <h4><Moon size={16} color="#a855f7" /> Sleep</h4>
-          <div className={styles.widgetVal}>7.5 hrs</div>
-        </div>
+        <WellnessWidgets />
       </div>
     </div>
   );

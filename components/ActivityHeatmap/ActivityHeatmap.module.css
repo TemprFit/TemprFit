@@ -19,54 +19,74 @@
   color: var(--color-text);
 }
 
-.legend {
+.controls {
   display: flex;
   align-items: center;
-  gap: 4px;
-  font-size: 0.8rem;
+  gap: 12px;
   color: var(--color-text-muted);
 }
 
-.legend span {
-  margin: 0 4px;
-}
-
-.grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-}
-
-.block {
-  width: 12px;
-  height: 12px;
-  border-radius: 2px;
-  background: rgba(255, 255, 255, 0.05); /* Level 0 */
-  transition: all 0.2s ease;
-}
-
-.block.level0 {
+.controls button {
   background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--color-text);
+  border-radius: 6px;
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-.block.level1 {
-  background: #0d4429;
+.controls button:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
 
-.block.level2 {
-  background: #006d32;
+.calendar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.block.level3 {
-  background: #26a641;
+.weekdays, .week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  text-align: center;
 }
 
-.block.level4 {
-  background: #39d353;
+.weekdays span {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  font-weight: 500;
 }
 
-.block:hover {
-  transform: scale(1.2);
-  outline: 1px solid rgba(255,255,255,0.5);
-  z-index: 10;
+.day, .emptyDay {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-size: 0.85rem;
 }
+
+.emptyDay {
+  background: transparent;
+}
+
+.day {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text);
+  transition: all 0.2s ease;
+  cursor: default;
+}
+
+.day.activeDay {
+  background: #22c55e;
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.3);
+}
+
+.day:hover {
+  transform: scale(1.1);
+}
+

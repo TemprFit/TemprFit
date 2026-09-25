@@ -90,14 +90,33 @@ function BuildWorkoutForm() {
   const addExercise = (ex) => {
     if (exercises.some((e) => e.exercise._id === ex._id)) return;
     setExercises((prev) => [...prev, { exercise: ex, sets: [defaultSet()] }]);
-    setQuery('');
-    setResults([]);
-    setActiveMuscle('');
-    setBrowseResults([]);
+    // We intentionally do NOT clear the query/results so the user can easily add multiple exercises in a row.
   };
 
   const removeExercise = (idx) => {
     setExercises((prev) => prev.filter((_, i) => i !== idx));
+  };
+
+  const moveExerciseUp = (idx) => {
+    if (idx === 0) return;
+    setExercises((prev) => {
+      const next = [...prev];
+      const temp = next[idx - 1];
+      next[idx - 1] = next[idx];
+      next[idx] = temp;
+      return next;
+    });
+  };
+
+  const moveExerciseDown = (idx) => {
+    if (idx === exercises.length - 1) return;
+    setExercises((prev) => {
+      const next = [...prev];
+      const temp = next[idx + 1];
+      next[idx + 1] = next[idx];
+      next[idx] = temp;
+      return next;
+    });
   };
 
   const updateSet = (exIdx, setIdx, field, value) => {
@@ -222,7 +241,10 @@ function BuildWorkoutForm() {
           {exercises.map((item, exIdx) => (
             <div key={item.exercise._id} className={styles.exerciseBlock}>
               <div className={styles.exerciseHeader}>
-                <GripVertical size={16} className={styles.gripIcon} />
+                <div className={styles.exerciseReorder}>
+                  <button disabled={exIdx === 0} onClick={() => moveExerciseUp(exIdx)}>▲</button>
+                  <button disabled={exIdx === exercises.length - 1} onClick={() => moveExerciseDown(exIdx)}>▼</button>
+                </div>
                 <h3>{item.exercise.name}</h3>
                 <button className={styles.removeBtn} onClick={() => removeExercise(exIdx)}>
                   <Trash2 size={15} />

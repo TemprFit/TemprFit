@@ -12,32 +12,34 @@ export async function POST(req) {
     const decoded = verifyToken(token)
     if (!decoded) return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
 
-    const { weight, height, bmi, category, advice } = await req.json()
+    const { weight, height, bmi, category, advice, notes, date } = await req.json()
 
     if (!weight || !height || !bmi || !category) {
       return NextResponse.json({ error: 'Missing fields' }, { status: 400 })
     }
 
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
+    const entryDate = date ? new Date(date) : new Date()
+    entryDate.setHours(0, 0, 0, 0)
 
-    let entry = await BMILog.findOne({ user: decoded.id, date: today })
+    let entry = await BMILog.findOne({ user: decoded.id, date: entryDate })
     if (entry) {
       entry.weight = weight
       entry.height = height
       entry.bmi = bmi
       entry.category = category
       entry.advice = advice
+      if (notes !== undefined) entry.notes = notes
       await entry.save()
     } else {
       entry = await BMILog.create({
         user: decoded.id,
-        date: today,
+        date: entryDate,
         weight,
         height,
         bmi,
         category,
-        advice
+        advice,
+        notes
       })
     }
 

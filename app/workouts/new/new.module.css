@@ -309,3 +309,5 @@
 .saveBtn:not(:disabled):hover {
   background: var(--color-primary-hover);
 }
+
+.exerciseReorder { display: flex; flex-direction: column; gap: 2px; margin-right: 8px; } .exerciseReorder button { background: none; border: none; color: var(--color-text-muted); cursor: pointer; padding: 2px; font-size: 0.7rem; } .exerciseReorder button:disabled { opacity: 0.3; cursor: default; } .exerciseReorder button:hover:not(:disabled) { color: var(--color-primary); }

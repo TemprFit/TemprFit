@@ -12,6 +12,7 @@ export async function GET(req) {
   try {
     const moments = await Moment.find({})
       .sort({ createdAt: -1 })
+      .limit(30)
       .populate('user', 'username avatarUrl activeColor activeBorder')
       .populate('comments.user', 'username avatarUrl activeColor activeBorder')
       .populate('comments.replies.user', 'username avatarUrl activeColor activeBorder')

@@ -205,3 +205,5 @@
     display: none;
   }
 }
+
+@media (max-width: 900px) { .hero { height: 100dvh; min-height: 600px; } .slideImage { object-position: top center !important; } }

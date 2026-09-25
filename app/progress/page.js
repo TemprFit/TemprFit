@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { TrendingUp, Dumbbell, Trophy, Flame, Calendar, Sparkles, RefreshCw } from 'lucide-react';
+import { TrendingUp, Dumbbell, Trophy, Flame, Calendar, Sparkles, RefreshCw, Clock, Zap } from 'lucide-react';
 import Sidebar from '@/components/Sidebar';
 import ChartWidget from '@/components/ChartWidget';
 import styles from './progress.module.css';
@@ -128,7 +128,7 @@ export default function ProgressPage() {
                   <Flame size={20} style={{ color: '#f97316' }} />
                   <div>
                     <span className={styles.statValue}>{data.totalVolumeAllTime.toLocaleString()}</span>
-                    <span className={styles.statLabel}>Total Volume Lifted</span>
+                    <span className={styles.statLabel}>Total Volume Lifted (kg)</span>
                   </div>
                 </div>
                 <div className={styles.statCard}>
@@ -143,6 +143,20 @@ export default function ProgressPage() {
                   <div>
                     <span className={styles.statValue}>{data.currentStreak}d</span>
                     <span className={styles.statLabel}>Current Streak (best: {data.longestStreak}d)</span>
+                  </div>
+                </div>
+                <div className={styles.statCard}>
+                  <Clock size={20} style={{ color: '#f59e0b' }} />
+                  <div>
+                    <span className={styles.statValue}>{Math.floor((data.totalTimeMinutes || 0) / 60)}h {(data.totalTimeMinutes || 0) % 60}m</span>
+                    <span className={styles.statLabel}>Total Time Training</span>
+                  </div>
+                </div>
+                <div className={styles.statCard}>
+                  <Zap size={20} style={{ color: '#ef4444' }} />
+                  <div>
+                    <span className={styles.statValue}>{(data.totalCaloriesBurned || 0).toLocaleString()}</span>
+                    <span className={styles.statLabel}>Est. Calories Burned (kcal)</span>
                   </div>
                 </div>
               </div>

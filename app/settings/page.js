@@ -21,6 +21,7 @@ export default function SettingsPage() {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState('');
   const [activeMode, setActiveMode] = useState('trainee');
+  const [isAvatarViewerOpen, setIsAvatarViewerOpen] = useState(false);
   
   const [passwordForm, setPasswordForm] = useState({ current: '', new: '', confirm: '' });
   const [passwordMessage, setPasswordMessage] = useState('');
@@ -59,6 +60,8 @@ export default function SettingsPage() {
           trainerIntroVideoUrl: data.user.trainerInfo?.introVideoUrl || '',
           trainerExpertise: data.user.trainerInfo?.expertise?.join(', ') || '',
           trainerExperienceYears: data.user.trainerInfo?.experienceYears || 0,
+          currentBodyWeight: data.user.fitnessProfile?.bodyMetrics?.currentWeightKg || '',
+          targetBodyWeight: data.user.fitnessProfile?.bodyMetrics?.targetWeightKg || '',
         });
         
         if (data.user.goals?.targetExerciseSlug) {
@@ -135,6 +138,12 @@ export default function SettingsPage() {
             expertise: form.trainerExpertise.split(',').map(s => s.trim()).filter(Boolean),
             experienceYears: Number(form.trainerExperienceYears) || 0,
           } : undefined,
+          fitnessProfile: {
+            bodyMetrics: {
+              currentWeightKg: form.currentBodyWeight === '' ? null : Number(form.currentBodyWeight),
+              targetWeightKg: form.targetBodyWeight === '' ? null : Number(form.targetBodyWeight),
+            }
+          },
         }),
       });
       const data = await res.json();
@@ -261,7 +270,12 @@ export default function SettingsPage() {
           <div className={styles.card}>
             <h3>Profile Photo</h3>
             <div className={styles.avatarRow}>
-              <div className={styles.avatarPreview}>
+              <div 
+                className={styles.avatarPreview} 
+                onClick={() => { if (form.avatarUrl) setIsAvatarViewerOpen(true); }}
+                style={{ cursor: form.avatarUrl ? 'pointer' : 'default' }}
+                title="Tap to view"
+              >
                 {form.avatarUrl ? (
                   <img src={form.avatarUrl} alt="Your avatar" />
                 ) : (
@@ -387,6 +401,27 @@ export default function SettingsPage() {
                         {exp}
                       </button>
                     ))}
+                  </div>
+                </div>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+                  <div className={styles.field}>
+                    <label>Current Body Weight ({form.weightUnit})</label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={form.currentBodyWeight}
+                      onChange={(e) => setForm({ ...form, currentBodyWeight: e.target.value })}
+                    />
+                  </div>
+                  <div className={styles.field}>
+                    <label>Target Body Weight ({form.weightUnit})</label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={form.targetBodyWeight}
+                      onChange={(e) => setForm({ ...form, targetBodyWeight: e.target.value })}
+                    />
                   </div>
                 </div>
               </div>
@@ -641,6 +676,26 @@ export default function SettingsPage() {
           </div>
         </div>
       </div>
+
+      {isAvatarViewerOpen && (
+        <div 
+          className={styles.viewerOverlay} 
+          role="dialog" 
+          aria-label="Profile photo preview"
+          onClick={() => setIsAvatarViewerOpen(false)}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+        >
+          <div onClick={e => e.stopPropagation()} style={{ position: 'relative', cursor: 'default' }}>
+            <button 
+              onClick={() => setIsAvatarViewerOpen(false)}
+              style={{ position: 'absolute', top: '-40px', right: '-40px', background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer', padding: '8px' }}
+            >
+              <X size={24} />
+            </button>
+            <img src={form.avatarUrl} alt="Avatar full size" style={{ maxWidth: '90vw', maxHeight: '90vh', borderRadius: '16px', objectFit: 'contain' }} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

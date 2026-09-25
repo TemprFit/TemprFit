@@ -8,6 +8,8 @@ import styles from './calculator.module.css'
 export default function BMICalculator() {
   const [weight, setWeight] = useState('')
   const [height, setHeight] = useState('')
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0])
+  const [notes, setNotes] = useState('')
   const [result, setResult] = useState(null)
   const [loading, setLoading] = useState(false)
   const [history, setHistory] = useState([])
@@ -53,7 +55,7 @@ export default function BMICalculator() {
       advice = 'Consider consulting a healthcare provider or a TemprFit coach to plan a safe weight loss journey.'
     }
 
-    const newResult = { weight: w, height: parseFloat(height), bmi: bmiValue, category, advice }
+    const newResult = { weight: w, height: parseFloat(height), bmi: bmiValue, category, advice, notes, date }
     setResult(newResult)
 
     // Save to DB
@@ -91,6 +93,16 @@ export default function BMICalculator() {
             </h2>
             <form onSubmit={calculateBMI}>
               <div className={styles.formGroup}>
+                <label className={styles.label}>Date</label>
+                <input
+                  type="date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  className={styles.input}
+                  required
+                />
+              </div>
+              <div className={styles.formGroup}>
                 <label className={styles.label}>Weight (kg)</label>
                 <input
                   type="number"
@@ -110,6 +122,16 @@ export default function BMICalculator() {
                   className={styles.input}
                   placeholder="e.g. 175"
                   required
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Notes (Optional)</label>
+                <textarea
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  className={styles.input}
+                  placeholder="e.g. Feeling energetic today..."
+                  rows={2}
                 />
               </div>
               <button
@@ -152,6 +174,7 @@ export default function BMICalculator() {
                   <th>Weight</th>
                   <th>BMI</th>
                   <th>Category</th>
+                  <th>Notes</th>
                 </tr>
               </thead>
               <tbody>
@@ -161,6 +184,7 @@ export default function BMICalculator() {
                     <td>{log.weight} kg</td>
                     <td>{log.bmi}</td>
                     <td>{log.category}</td>
+                    <td>{log.notes || '-'}</td>
                   </tr>
                 ))}
               </tbody>

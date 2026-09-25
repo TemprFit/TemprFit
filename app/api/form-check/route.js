@@ -6,7 +6,7 @@ import { askGemini, GeminiConfigError } from '@/lib/gemini'
 
 export const dynamic = 'force-dynamic'
 
-const SUPPORTED = ['squat', 'push-up', 'plank', 'lunge', 'deadlift']
+const SUPPORTED = ['squat', 'push-up', 'plank', 'lunge', 'deadlift', 'other']
 
 export async function GET() {
   await connectDB()
@@ -67,7 +67,7 @@ export async function POST(request) {
 
   const systemPrompt = `You are a fitness form coach. You are given a list of form issues that were
 detected automatically from pose-tracking landmarks on a user's ${RULE_EXERCISE_LABEL(exerciseSlug)} video.
-Write a short (3-5 sentence), encouraging, plain-language summary of what to fix, in order of importance.
+${exerciseSlug === 'other' ? 'Since the user selected "Other (Auto-detect)", try to infer the exercise they were likely doing based on the types of issues flagged, and provide feedback on how to fix their form.' : 'Write a short (3-5 sentence), encouraging, plain-language summary of what to fix, in order of importance.'}
 Do not invent issues that aren't in the list. Do not describe the video itself (you cannot see it) —
 only comment on the flagged issues provided. If a "good_depth" style positive note is included, mention
 it briefly as a positive. Avoid clinical/medical language; this is coaching feedback, not a diagnosis.
@@ -108,6 +108,7 @@ function RULE_EXERCISE_LABEL(slug) {
     plank: 'Plank',
     lunge: 'Lunge',
     deadlift: 'Deadlift',
+    other: 'Other (Auto-detect)'
   }
   return labels[slug] || slug
 }

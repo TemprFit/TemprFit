@@ -1,63 +1,98 @@
 'use client';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import styles from './ActivityHeatmap.module.css';
 
-export default function ActivityHeatmap({ data = [], days = 84 }) {
-  // data should be an array of objects: { date: 'YYYY-MM-DD', count: number }
-  
-  const heatmapData = useMemo(() => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+export default function ActivityHeatmap({ data = [] }) {
+  const [currentDate, setCurrentDate] = useState(new Date());
+
+  const calendar = useMemo(() => {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    
+    // First day of the month
+    const firstDay = new Date(year, month, 1);
+    // Last day of the month
+    const lastDay = new Date(year, month + 1, 0);
+    
+    const daysInMonth = lastDay.getDate();
+    const startingDayOfWeek = firstDay.getDay(); // 0 is Sunday
     
     const dataMap = {};
     data.forEach(item => {
       dataMap[item.date] = item.count;
     });
 
-    const daysArray = [];
-    for (let i = days - 1; i >= 0; i--) {
-      const d = new Date(today);
-      d.setDate(d.getDate() - i);
-      const dateStr = d.toISOString().split('T')[0];
-      
-      const count = dataMap[dateStr] || 0;
-      
-      let level = 0;
-      if (count === 1) level = 1;
-      else if (count === 2) level = 2;
-      else if (count >= 3) level = 3;
-      
-      daysArray.push({
-        date: dateStr,
-        count,
-        level
-      });
+    const weeks = [];
+    let currentWeek = [];
+    
+    // Pad start of month
+    for (let i = 0; i < startingDayOfWeek; i++) {
+      currentWeek.push(null);
     }
     
-    // Pad the beginning so the grid aligns well (optional, but we'll just flow it using CSS Grid)
-    return daysArray;
-  }, [data, days]);
+    for (let day = 1; day <= daysInMonth; day++) {
+      const d = new Date(year, month, day);
+      const dateStr = d.toISOString().split('T')[0];
+      const count = dataMap[dateStr] || 0;
+      
+      currentWeek.push({ day, dateStr, count });
+      
+      if (currentWeek.length === 7) {
+        weeks.push(currentWeek);
+        currentWeek = [];
+      }
+    }
+    
+    if (currentWeek.length > 0) {
+      while (currentWeek.length < 7) {
+        currentWeek.push(null);
+      }
+      weeks.push(currentWeek);
+    }
+    
+    return weeks;
+  }, [currentDate, data]);
+
+  const monthNames = ["January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"];
+
+  const prevMonth = () => {
+    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
+  };
+  const nextMonth = () => {
+    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
+  };
 
   return (
     <div className={styles.container}>
       <div className={styles.header}>
         <h4>Workout Consistency</h4>
-        <span className={styles.legend}>
-          <span>Less</span>
-          <div className={`${styles.block} ${styles.level0}`} />
-          <div className={`${styles.block} ${styles.level1}`} />
-          <div className={`${styles.block} ${styles.level2}`} />
-          <div className={`${styles.block} ${styles.level3}`} />
-          <span>More</span>
-        </span>
+        <div className={styles.controls}>
+          <button onClick={prevMonth}>&lt;</button>
+          <span>{monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}</span>
+          <button onClick={nextMonth}>&gt;</button>
+        </div>
       </div>
-      <div className={styles.grid}>
-        {heatmapData.map((day, i) => (
-          <div 
-            key={day.date}
-            className={`${styles.block} ${styles['level' + day.level]}`}
-            title={`${day.date}: ${day.count} session(s)`}
-          />
+      <div className={styles.calendar}>
+        <div className={styles.weekdays}>
+          <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+        </div>
+        {calendar.map((week, wIdx) => (
+          <div key={wIdx} className={styles.week}>
+            {week.map((dayObj, dIdx) => {
+              if (!dayObj) return <div key={dIdx} className={styles.emptyDay} />;
+              const isGreen = dayObj.count > 0;
+              return (
+                <div 
+                  key={dIdx} 
+                  className={`${styles.day} ${isGreen ? styles.activeDay : ''}`}
+                  title={`${dayObj.dateStr}: ${dayObj.count} session(s)`}
+                >
+                  {dayObj.day}
+                </div>
+              );
+            })}
+          </div>
         ))}
       </div>
     </div>

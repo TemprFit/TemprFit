@@ -9,6 +9,15 @@ export async function POST(req) {
     const user = await getSessionUser();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
+    const { checkAndIncrementAILimit } = await import('@/lib/aiLimit');
+    const limitCheck = await checkAndIncrementAILimit(user._id);
+    if (!limitCheck.allowed) {
+      return NextResponse.json(
+        { error: limitCheck.error, upgrade: true },
+        { status: 429 }
+      );
+    }
+
     const { baseImage, newImage, gender, baseTags, newTags } = await req.json();
 
     if (!baseImage || !newImage) {

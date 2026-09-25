@@ -74,11 +74,8 @@ export default function VoiceCoach({ context = {}, autoSpeakPrompt = '', syncKey
   }, []);
 
   // Handle active auto-speak triggers
-  useEffect(() => {
-    if (autoSpeakPrompt && supported && !isMuted) {
-      handleVoiceQuery(autoSpeakPrompt, syncKey);
-    }
-  }, [autoSpeakPrompt, isMuted, supported, syncKey]);
+  // Removed per user request: AI should not auto-talk unless you tap the speak button.
+  // The user will tap the mic to initiate conversation.
 
   const toggleListen = () => {
     if (isListening) {

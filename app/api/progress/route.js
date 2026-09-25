@@ -71,12 +71,23 @@ export async function GET(request) {
 
   const totalVolumeAllTime = completedSessions.reduce((sum, s) => sum + (s.totalVolume || 0), 0)
   const totalPRs = allPRs.length
+  
+  const totalTimeSeconds = completedSessions.reduce((sum, s) => {
+    if (s.startedAt && s.completedAt) {
+      return sum + Math.max(0, (new Date(s.completedAt) - new Date(s.startedAt)) / 1000);
+    }
+    return sum;
+  }, 0);
+  const totalTimeMinutes = Math.round(totalTimeSeconds / 60);
+  const totalCaloriesBurned = Math.round(totalTimeMinutes * 6.5); // Estimate
 
   return NextResponse.json({
     hasHistory: completedSessions.length > 0,
     totalSessions: completedSessions.length,
     totalVolumeAllTime,
     totalPRs,
+    totalTimeMinutes,
+    totalCaloriesBurned,
     currentStreak: user.currentStreak || 0,
     longestStreak: user.longestStreak || 0,
     volumeByWeek,

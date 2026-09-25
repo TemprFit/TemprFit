@@ -424,7 +424,7 @@ export default function MomentsPage() {
                         </Link>
                       </div>
                     ) : m.mediaUrl?.match(/\.(mp4|webm)$/i) ? (
-                      <video src={m.mediaUrl} className={styles.media} muted loop autoPlay />
+                      <video src={m.mediaUrl} className={styles.media} muted loop autoPlay playsInline preload="metadata" />
                     ) : m.mediaUrl ? (
                       <img src={m.mediaUrl} className={styles.media} alt="Moment" />
                     ) : null}

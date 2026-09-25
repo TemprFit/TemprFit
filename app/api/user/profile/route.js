@@ -86,6 +86,16 @@ async function pickEditableFields(body, currentUserId) {
     }
   }
 
+  // Body Metrics
+  if (body.fitnessProfile?.bodyMetrics) {
+    if (body.fitnessProfile.bodyMetrics.currentWeightKg === null || typeof body.fitnessProfile.bodyMetrics.currentWeightKg === 'number') {
+      update['fitnessProfile.bodyMetrics.currentWeightKg'] = body.fitnessProfile.bodyMetrics.currentWeightKg
+    }
+    if (body.fitnessProfile.bodyMetrics.targetWeightKg === null || typeof body.fitnessProfile.bodyMetrics.targetWeightKg === 'number') {
+      update['fitnessProfile.bodyMetrics.targetWeightKg'] = body.fitnessProfile.bodyMetrics.targetWeightKg
+    }
+  }
+
   return update
 }
 
