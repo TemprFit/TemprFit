@@ -52,7 +52,7 @@ export async function POST(req) {
 
 export async function GET(req) {
   try {
-    await dbConnect()
+    await connectDB()
     const token = req.cookies.get('token')?.value
     if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 

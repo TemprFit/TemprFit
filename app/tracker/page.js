@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { BarChart3, TrendingDown, Scale, Target } from 'lucide-react'
+import { BarChart3, TrendingDown, Scale, Target, Trash2 } from 'lucide-react'
 import Sidebar from '@/components/Sidebar'
 import styles from './tracker.module.css'
 import ChartWidget from '@/components/ChartWidget'
+import WaterTracker from '@/components/WaterTracker'
+import SleepTracker from '@/components/SleepTracker'
 
 export default function TrackerPage() {
   const [logs, setLogs] = useState([])
@@ -26,6 +28,19 @@ export default function TrackerPage() {
       })
   }, [])
 
+  const deleteLog = async (id) => {
+    if (!confirm('Are you sure you want to delete this log?')) return
+    try {
+      const res = await fetch(`/api/bmi/${id}`, { method: 'DELETE' })
+      const data = await res.json()
+      if (data.success) {
+        setLogs(prev => prev.filter(log => log._id !== id))
+      }
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
   const weightData = logs.map(log => ({
     label: new Date(log.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
     value: log.weight
@@ -41,13 +56,17 @@ export default function TrackerPage() {
       <Sidebar />
       <div className={styles.content}>
         <div className="container">
-          <div className={styles.header}>
-            <BarChart3 size={32} />
-            <div>
-              <h1>Bodyweight & Diet Tracker</h1>
-              <p>Track your physical progress and see how your diet impacts your body composition over time.</p>
-            </div>
+          <div style={{ marginBottom: '40px' }}>
+            <h1 className={styles.header}>
+              <BarChart3 size={32} /> BMI and Health Tracker
+            </h1>
+            <p className={styles.subtitle}>
+              Track your physical progress and see how your diet impacts your body composition over time.
+            </p>
           </div>
+          
+          <WaterTracker />
+          <SleepTracker />
 
           {loading ? (
             <p>Loading your tracking data...</p>
@@ -61,8 +80,8 @@ export default function TrackerPage() {
           ) : (
             <div className={styles.grid}>
               <div className={styles.charts}>
-                <ChartWidget data={weightData} type="line" title="Bodyweight Trend (kg)" color="#3b82f6" />
-                <ChartWidget data={bmiData} type="line" title="BMI Trend" color="#8b5cf6" />
+                <ChartWidget data={weightData} type="line" title="Bodyweight Trend (kg)" color="#22c55e" />
+                <ChartWidget data={bmiData} type="line" title="BMI Trend" color="#10b981" />
               </div>
               
               <div className={styles.historyList}>
@@ -75,6 +94,8 @@ export default function TrackerPage() {
                         <th>Weight (kg)</th>
                         <th>BMI</th>
                         <th>Notes</th>
+                        <th>AI Remark</th>
+                        <th>Action</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -84,6 +105,12 @@ export default function TrackerPage() {
                           <td>{log.weight}</td>
                           <td>{log.bmi}</td>
                           <td>{log.notes || '-'}</td>
+                          <td style={{ maxWidth: '200px', fontSize: '0.85rem' }}>{log.advice || '-'}</td>
+                          <td>
+                            <button onClick={() => deleteLog(log._id)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              <Trash2 size={18} />
+                            </button>
+                          </td>
                         </tr>
                       ))}
                     </tbody>

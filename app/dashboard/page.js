@@ -12,6 +12,8 @@ import ChartWidget from '@/components/ChartWidget';
 import WeightTracker from '@/components/WeightTracker';
 import AIModal from '@/components/AIModal';
 import HealthGraphs from '@/components/HealthGraphs';
+import WaterTracker from '@/components/WaterTracker';
+import SleepTracker from '@/components/SleepTracker';
 import DashboardMeals from '@/components/DashboardMeals';
 import MysteryBoxModal from '@/components/MysteryBoxModal';
 import WearablesSync from '@/components/WearablesSync';
@@ -287,6 +289,8 @@ export default function Dashboard() {
               <Link href="/progress-timeline" style={{ color: '#22c55e', fontSize: '0.9rem', fontWeight: 600 }}>View Photo Timeline &rarr;</Link>
             </div>
             <WeightTracker />
+            <WaterTracker />
+            <SleepTracker />
             <WearablesSync />
           </div>
 

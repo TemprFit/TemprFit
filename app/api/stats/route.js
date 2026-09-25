@@ -27,6 +27,7 @@ export async function GET() {
     status: 'completed',
   })
     .sort({ completedAt: -1 })
+    .populate('exercises.exercise', 'name')
     .lean()
 
   const thisWeekSessions = completedSessions.filter(
@@ -85,10 +86,20 @@ export async function GET() {
   completedSessions.forEach(s => {
     if (!s.completedAt) return;
     const dateStr = new Date(s.completedAt).toISOString().split('T')[0];
-    heatmapMap[dateStr] = (heatmapMap[dateStr] || 0) + 1;
+    if (!heatmapMap[dateStr]) {
+      heatmapMap[dateStr] = { count: 0, exercises: new Set() };
+    }
+    heatmapMap[dateStr].count += 1;
+    if (s.exercises && s.exercises.length > 0) {
+      s.exercises.forEach(e => {
+        if (e.exercise && e.exercise.name) {
+          heatmapMap[dateStr].exercises.add(e.exercise.name);
+        }
+      });
+    }
   });
-  for (const [date, count] of Object.entries(heatmapMap)) {
-    activityHeatmap.push({ date, count });
+  for (const [date, data] of Object.entries(heatmapMap)) {
+    activityHeatmap.push({ date, count: data.count, exercises: Array.from(data.exercises) });
   }
 
   return NextResponse.json({

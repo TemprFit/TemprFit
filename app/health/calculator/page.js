@@ -57,21 +57,29 @@ export default function BMICalculator() {
 
     const newResult = { weight: w, height: parseFloat(height), bmi: bmiValue, category, advice, notes, date }
     setResult(newResult)
+  }
 
-    // Save to DB
+  const saveResult = async () => {
+    if (!result) return
     setLoading(true)
     try {
       await fetch('/api/bmi', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newResult)
+        body: JSON.stringify(result)
       })
       fetchHistory()
+      setResult(null)
+      setNotes('')
     } catch (err) {
       console.error(err)
     } finally {
       setLoading(false)
     }
+  }
+
+  const discardResult = () => {
+    setResult(null)
   }
 
   return (
@@ -136,10 +144,9 @@ export default function BMICalculator() {
               </div>
               <button
                 type="submit"
-                disabled={loading}
                 className={styles.submitBtn}
               >
-                {loading ? 'Saving...' : 'Calculate & Save'}
+                Calculate
               </button>
             </form>
           </motion.div>
@@ -158,6 +165,15 @@ export default function BMICalculator() {
             <div className={styles.adviceBox}>
               <Info size={24} className={styles.infoIcon} />
               <p className={styles.adviceText}>{result.advice}</p>
+            </div>
+
+            <div style={{ display: 'flex', gap: '16px', marginTop: '24px' }}>
+              <button onClick={saveResult} disabled={loading} className={styles.submitBtn} style={{ flex: 1 }}>
+                 {loading ? 'Saving...' : <><Save size={20} /> Save to Tracker</>}
+              </button>
+              <button onClick={discardResult} className={styles.submitBtn} style={{ flex: 1, background: 'transparent', border: '1px solid var(--color-border)', color: 'var(--color-text)', boxShadow: 'none' }}>
+                 Discard
+              </button>
             </div>
           </motion.div>
         )}

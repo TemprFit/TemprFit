@@ -1,5 +1,5 @@
 .page {
-  padding: 40px 20px;
+  padding: 100px 20px 40px;
   min-height: calc(100vh - 100px);
 }
 
@@ -44,7 +44,7 @@
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0; height: 4px;
-  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  background: linear-gradient(90deg, var(--color-primary), #10b981);
 }
 
 .cardTitle {
@@ -93,7 +93,7 @@
   align-items: center;
   gap: 8px;
   padding: 14px;
-  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  background: linear-gradient(135deg, var(--color-primary), #10b981);
   color: var(--color-text);
   border: none;
   border-radius: 12px;
@@ -101,12 +101,12 @@
   font-weight: 600;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
-  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 4px 14px rgba(34, 197, 94, 0.4);
 }
 
 .submitBtn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
+  box-shadow: 0 6px 20px rgba(34, 197, 94, 0.6);
 }
 
 .submitBtn:disabled {
@@ -125,7 +125,7 @@
   font-weight: 900;
   color: var(--color-primary);
   line-height: 1;
-  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  background: linear-gradient(135deg, var(--color-primary), #10b981);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }

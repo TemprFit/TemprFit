@@ -4,6 +4,7 @@ import styles from './ActivityHeatmap.module.css';
 
 export default function ActivityHeatmap({ data = [] }) {
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [selectedDay, setSelectedDay] = useState(null);
 
   const calendar = useMemo(() => {
     const year = currentDate.getFullYear();
@@ -19,7 +20,7 @@ export default function ActivityHeatmap({ data = [] }) {
     
     const dataMap = {};
     data.forEach(item => {
-      dataMap[item.date] = item.count;
+      dataMap[item.date] = { count: item.count, exercises: item.exercises || [] };
     });
 
     const weeks = [];
@@ -33,9 +34,10 @@ export default function ActivityHeatmap({ data = [] }) {
     for (let day = 1; day <= daysInMonth; day++) {
       const d = new Date(year, month, day);
       const dateStr = d.toISOString().split('T')[0];
-      const count = dataMap[dateStr] || 0;
+      const count = dataMap[dateStr] ? dataMap[dateStr].count : 0;
+      const exercises = dataMap[dateStr] ? dataMap[dateStr].exercises : [];
       
-      currentWeek.push({ day, dateStr, count });
+      currentWeek.push({ day, dateStr, count, exercises });
       
       if (currentWeek.length === 7) {
         weeks.push(currentWeek);
@@ -86,6 +88,8 @@ export default function ActivityHeatmap({ data = [] }) {
                 <div 
                   key={dIdx} 
                   className={`${styles.day} ${isGreen ? styles.activeDay : ''}`}
+                  onClick={() => { if (isGreen) setSelectedDay(dayObj) }}
+                  style={{ cursor: isGreen ? 'pointer' : 'default' }}
                   title={`${dayObj.dateStr}: ${dayObj.count} session(s)`}
                 >
                   {dayObj.day}
@@ -95,6 +99,31 @@ export default function ActivityHeatmap({ data = [] }) {
           </div>
         ))}
       </div>
+
+      {selectedDay && (
+        <div className={styles.modalOverlay} onClick={() => setSelectedDay(null)}>
+          <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
+            <h4 style={{ margin: '0 0 16px 0', fontSize: '1.2rem', color: 'var(--color-text)' }}>
+              {new Date(selectedDay.dateStr).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+            </h4>
+            <p style={{ margin: '0 0 16px 0', color: 'var(--color-primary)', fontWeight: 'bold' }}>
+              {selectedDay.count} Session(s) Completed
+            </p>
+            {selectedDay.exercises && selectedDay.exercises.length > 0 ? (
+              <ul style={{ paddingLeft: '20px', margin: '0 0 24px 0', color: 'var(--color-text-muted)' }}>
+                {selectedDay.exercises.map((ex, i) => (
+                  <li key={i} style={{ marginBottom: '8px' }}>{ex}</li>
+                ))}
+              </ul>
+            ) : (
+              <p style={{ color: 'var(--color-text-muted)', marginBottom: '24px' }}>No specific exercises recorded.</p>
+            )}
+            <button onClick={() => setSelectedDay(null)} style={{ background: 'var(--color-surface)', color: 'var(--color-text)', border: '1px solid var(--color-border)', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', width: '100%', fontWeight: 'bold' }}>
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
