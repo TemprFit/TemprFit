@@ -2,11 +2,13 @@
   display: flex;
   min-height: 100vh;
   padding-top: 72px;
+  max-width: 100vw;
+  overflow-x: hidden;
 }
 
 .content {
-  margin-left: 260px;
   flex: 1;
+  min-width: 0;
   margin-left: 76px;
   padding: 32px 0;
   transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
