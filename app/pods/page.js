@@ -30,6 +30,10 @@ export default function PodsPage() {
   const [newPodDesc, setNewPodDesc] = useState('');
   const [newPodIcon, setNewPodIcon] = useState('Dumbbell');
   const [newPodImage, setNewPodImage] = useState('');
+  const [newPodType, setNewPodType] = useState('standard');
+  const [newPodRewardType, setNewPodRewardType] = useState('multiple_winners');
+  const [newPodRules, setNewPodRules] = useState('');
+  const [selectedPod, setSelectedPod] = useState(null);
   const [uploadingImage, setUploadingImage] = useState(false);
 
   const handleImageUpload = async (e) => {
@@ -104,7 +108,7 @@ export default function PodsPage() {
       const res = await fetch('/api/pods', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: newPodName, description: newPodDesc, icon: newPodIcon, image: newPodImage, rewardXP: parseInt(newPodReward) || 0, rewardType: newPodRewardType })
+        body: JSON.stringify({ name: newPodName, description: newPodDesc, icon: newPodIcon, image: newPodImage, rewardXP: parseInt(newPodReward) || 0, rewardType: newPodRewardType, podType: newPodType, rules: newPodRules })
       });
       const data = await res.json();
       if (data.success) {
@@ -156,10 +160,15 @@ export default function PodsPage() {
             {pods.map(pod => {
               const Icon = ICON_MAP[pod.icon] || Activity;
               return (
-                <div key={pod.id} className={styles.podCard}>
+                <div key={pod.id} className={styles.podCard} onClick={() => setSelectedPod(pod)} style={{ cursor: 'pointer' }}>
                   <div className={styles.podHeader}>
                     <div>
                       <h3 className={styles.podName}>{pod.name}</h3>
+                      {pod.podType && pod.podType !== 'standard' && (
+                        <span style={{ fontSize: '0.7rem', padding: '2px 6px', background: 'var(--color-primary)', borderRadius: '4px', marginLeft: '8px' }}>
+                          {pod.podType.replace('_', ' ').toUpperCase()}
+                        </span>
+                      )}
                       <div className={styles.podMembers}>
                         <Users size={14} /> {pod.members} members
                       </div>
@@ -189,7 +198,7 @@ export default function PodsPage() {
 
                   <button 
                     className={`${styles.joinBtn} ${pod.joined ? styles.joinedBtn : ''}`}
-                    onClick={() => toggleJoin(pod.id)}
+                    onClick={(e) => { e.stopPropagation(); toggleJoin(pod.id); }}
                   >
                     {pod.joined ? 'Joined' : 'Join Pod'}
                   </button>
@@ -234,6 +243,71 @@ export default function PodsPage() {
 
         </div>
       </div>
+
+      {selectedPod && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalContent}>
+            <button className={styles.closeBtn} onClick={() => setSelectedPod(null)}>
+              <X size={24} />
+            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
+              <div style={{ width: '64px', height: '64px', borderRadius: '16px', background: 'var(--color-surface)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                {selectedPod.customImage ? (
+                  <img src={selectedPod.customImage} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  <Activity size={32} color="var(--color-primary)" />
+                )}
+              </div>
+              <div>
+                <h2 style={{ margin: 0 }}>{selectedPod.name}</h2>
+                <div style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', marginTop: '4px' }}>
+                  {selectedPod.members} Members • {selectedPod.podType?.replace('_', ' ').toUpperCase() || 'STANDARD'}
+                </div>
+              </div>
+            </div>
+            
+            <p style={{ lineHeight: '1.6', marginBottom: '16px' }}>{selectedPod.description}</p>
+            
+            {selectedPod.rules && (
+              <div style={{ background: 'rgba(255,255,255,0.05)', padding: '16px', borderRadius: '8px', marginBottom: '16px' }}>
+                <h4 style={{ margin: '0 0 8px 0', color: 'var(--color-primary)' }}>Pod Rules</h4>
+                <p style={{ margin: 0, fontSize: '0.9rem', lineHeight: '1.5' }}>{selectedPod.rules}</p>
+              </div>
+            )}
+
+            <div style={{ background: 'linear-gradient(45deg, rgba(34,197,94,0.1), rgba(16,185,129,0.1))', padding: '16px', borderRadius: '8px', border: '1px solid rgba(34,197,94,0.2)', marginBottom: '24px' }}>
+              <h4 style={{ margin: '0 0 8px 0', color: '#22c55e', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Trophy size={16} /> Reward Details
+              </h4>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', fontSize: '0.9rem' }}>
+                <div>
+                  <div style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem' }}>Reward Type</div>
+                  <div style={{ fontWeight: 'bold' }}>{selectedPod.challenge?.rewardType?.replace('_', ' ').toUpperCase() || 'SHARED POOL'}</div>
+                </div>
+                <div>
+                  <div style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem' }}>Reward XP</div>
+                  <div style={{ fontWeight: 'bold', color: '#fbbf24' }}>{selectedPod.challenge?.rewardXP || 0} XP Pool</div>
+                </div>
+              </div>
+              <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginTop: '12px', marginBottom: 0 }}>
+                {selectedPod.challenge?.rewardType === 'single_winner' 
+                  ? 'The user with the highest contribution takes the entire XP pool at the end of the pod.' 
+                  : 'The XP pool will be shared proportionally among all active contributors based on their effort.'}
+              </p>
+            </div>
+            
+            <button 
+              style={{ width: '100%', padding: '16px', background: 'var(--color-primary)', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}
+              onClick={() => {
+                toggleJoin(selectedPod.id);
+                setSelectedPod(null);
+              }}
+            >
+              {selectedPod.joined ? 'Leave Pod' : 'Join Pod Now'}
+            </button>
+          </div>
+        </div>
+      )}
 
       {showCreateModal && (
         <div className={styles.modalOverlay}>

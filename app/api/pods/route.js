@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import Pod from '@/models/Pod';
+import User from '@/models/User';
 import { getSessionUser } from '@/lib/auth';
 
 // Seed some default pods if none exist
@@ -30,15 +31,38 @@ export async function POST(req) {
     }
 
     const body = await req.json();
-    const { name, description, icon, customImage, challenge, image, rewardXP, rewardType } = body;
+    const { name, description, icon, customImage, image, rewardXP, rewardType, podType, rules } = body;
+    
     if (!name || !description || !icon) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
+
+    const parsedRewardXP = parseInt(rewardXP) || 0;
+
+    if (parsedRewardXP > 0) {
+      const dbUser = await User.findById(user._id);
+      if (dbUser.xp < parsedRewardXP) {
+        return NextResponse.json({ error: 'Not enough XP to create this reward pool' }, { status: 400 });
+      }
+      dbUser.xp -= parsedRewardXP;
+      await dbUser.save();
+    }
+
+    const finalImage = image || customImage || null;
 
     const newPod = await Pod.create({
       name,
       description,
       icon,
+      customImage: finalImage,
+      podType: podType || 'standard',
+      rules: rules || '',
+      challenge: {
+        rewardXP: parsedRewardXP,
+        rewardType: rewardType || 'multiple_winners',
+        targetVolume: 50000,
+        currentVolume: 0
+      },
       members: [user._id] // creator automatically joins
     });
 
@@ -70,6 +94,8 @@ export async function GET(req) {
       customImage: p.customImage,
       icon: p.icon,
       challenge: p.challenge,
+      podType: p.podType,
+      rules: p.rules,
       members: p.members.length,
       joined: p.members.some(id => id.toString() === user._id.toString())
     }));

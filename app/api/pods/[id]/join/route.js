@@ -1,36 +1,33 @@
 import { NextResponse } from 'next/server';
 import { getSessionUser } from '@/lib/auth';
-import { cookies } from 'next/headers';
 import { connectDB } from '@/lib/db';
 import Pod from '@/models/Pod';
 
 export async function POST(req, { params }) {
   try {
-    const token = cookies().get('token')?.value;
-    if (!token) {
+    await connectDB();
+    
+    const user = await getSessionUser();
+    
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if (!decoded || !decoded.userId) {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
     const podId = params.id;
-    await connectDB();
     
     const pod = await Pod.findById(podId);
     if (!pod) {
       return NextResponse.json({ error: 'Pod not found' }, { status: 404 });
     }
 
-    const isMember = pod.members.some(id => id.toString() === sessionUser._id.toString());
+    const isMember = pod.members.some(id => id.toString() === user._id.toString());
 
     if (isMember) {
       // Leave pod
-      pod.members = pod.members.filter(id => id.toString() !== sessionUser._id.toString());
+      pod.members = pod.members.filter(id => id.toString() !== user._id.toString());
     } else {
       // Join pod
-      pod.members.push(sessionUser._id);
+      pod.members.push(user._id);
     }
 
     await pod.save();

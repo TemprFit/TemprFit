@@ -270,7 +270,8 @@ export default function OnboardingPage() {
       case 6: {
         const heightM = parseFloat(data.bodyMetrics.heightCm) / 100;
         const weightKg = parseFloat(data.bodyMetrics.currentWeightKg);
-        const bmi = (weightKg / (heightM * heightM)).toFixed(1);
+        const bmiValue = weightKg / (heightM * heightM);
+        const bmi = isNaN(bmiValue) ? '-' : bmiValue.toFixed(1);
         
         let message = '';
         if (data.primaryGoal === 'fat_loss') message = "Your AI Coach has built a caloric deficit plan tailored to burn fat while preserving muscle.";
