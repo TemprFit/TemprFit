@@ -133,6 +133,10 @@
 .userName {
   font-weight: 600;
   color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
 }
 
 .isMeBadge {
@@ -156,5 +160,51 @@
 @media (max-width: 1024px) {
   .content {
     margin-left: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .content {
+    padding: 16px 8px;
+  }
+  .title {
+    font-size: 1.4rem;
+  }
+  .subtitle {
+    font-size: 0.85rem;
+  }
+  .tabs {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 8px;
+  }
+  .tab {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    flex: 1 1 calc(50% - 4px);
+    text-align: center;
+  }
+  .boardHeader, .boardRow {
+    grid-template-columns: 32px 1fr 70px;
+    padding: 12px 8px;
+    gap: 8px;
+  }
+  .rank {
+    font-size: 0.95rem;
+  }
+  .userName {
+    font-size: 0.85rem;
+  }
+  .score {
+    font-size: 0.85rem;
+  }
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .userCol {
+    gap: 8px;
   }
 }

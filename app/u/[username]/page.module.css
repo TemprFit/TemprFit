@@ -142,3 +142,32 @@
     margin-left: 0;
   }
 }
+
+@media (max-width: 768px) {
+  .content {
+    padding: 16px 8px;
+  }
+  .profileCard {
+    padding: 32px 16px;
+  }
+  .username {
+    font-size: 1.8rem;
+  }
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .statCard {
+    padding: 12px 8px;
+  }
+  .statValue {
+    font-size: 1.2rem;
+  }
+  .statLabel {
+    font-size: 0.75rem;
+  }
+  .badgesGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+}

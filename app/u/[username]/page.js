@@ -5,7 +5,8 @@ import { useParams } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
 import UserAvatar from '@/components/UserAvatar';
 import { BADGES } from '@/lib/badges';
-import { Activity, Flame, Medal, Star, Trophy } from 'lucide-react';
+import { Activity, Flame, Medal, Star, Trophy, MapPin, User as UserIcon, Target, Users } from 'lucide-react';
+import Link from 'next/link';
 import styles from './page.module.css';
 
 export default function UserProfilePage() {
@@ -14,6 +15,7 @@ export default function UserProfilePage() {
   
   const [profile, setProfile] = useState(null);
   const [stats, setStats] = useState(null);
+  const [pods, setPods] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -23,6 +25,7 @@ export default function UserProfilePage() {
         if (data.user) {
           setProfile(data.user);
           setStats(data.stats);
+          setPods(data.pods || []);
         }
         setLoading(false);
       })
@@ -79,6 +82,25 @@ export default function UserProfilePage() {
               </div>
             )}
 
+            <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center', marginBottom: '24px', color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>
+              {(profile.age || profile.sex) && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <UserIcon size={16} /> 
+                  {profile.age ? `${profile.age} yrs` : ''} {profile.sex ? profile.sex.charAt(0).toUpperCase() + profile.sex.slice(1) : ''}
+                </div>
+              )}
+              {profile.fitnessProfile?.country && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <MapPin size={16} /> {profile.fitnessProfile.country}
+                </div>
+              )}
+              {profile.fitnessProfile?.primaryGoal && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <Target size={16} /> {profile.fitnessProfile.primaryGoal.replace('_', ' ')}
+                </div>
+              )}
+            </div>
+
             <div className={styles.statsGrid}>
               <div className={styles.statCard}>
                 <div className={styles.statValue} style={{ color: '#fbbf24' }}>{profile.xp || 0}</div>
@@ -126,6 +148,27 @@ export default function UserProfilePage() {
                     </div>
                   );
                 })}
+              </div>
+            )}
+          </div>
+
+          <div className={styles.section}>
+            <h2 className={styles.sectionTitle}>Joined Pods</h2>
+            {pods.length === 0 ? (
+              <p style={{ color: 'var(--color-text-muted)' }}>This user hasn&apos;t joined any pods yet.</p>
+            ) : (
+              <div className={styles.badgesGrid}>
+                {pods.map(pod => (
+                  <Link href={`/pods/${pod._id}`} key={pod._id} style={{ textDecoration: 'none' }}>
+                    <div className={styles.badgeCard}>
+                      <div className={styles.badgeIconWrap} style={{ background: 'rgba(34,197,94,0.1)', color: '#22c55e' }}>
+                        <Users size={24} />
+                      </div>
+                      <h3 className={styles.badgeName}>{pod.name}</h3>
+                      <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>{pod.isPrivate ? 'Private' : 'Public'}</p>
+                    </div>
+                  </Link>
+                ))}
               </div>
             )}
           </div>

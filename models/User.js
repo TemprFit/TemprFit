@@ -129,7 +129,7 @@ const UserSchema = new mongoose.Schema(
       specialInterests: [{ type: String }]
     },
     appPreferences: {
-      showOnLeaderboard: { type: Boolean, default: false }
+      showOnLeaderboard: { type: Boolean, default: true }
     },
     hasCompletedOnboarding: { type: Boolean, default: false },
     onboardingTourSeen: { type: Map, of: Boolean, default: {} },

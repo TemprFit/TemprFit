@@ -17,31 +17,18 @@ export async function GET(req) {
     let maxXp = Infinity;
 
     switch (league) {
-      case 'bronze':
-        minXp = 0;
-        maxXp = 4999;
-        break;
-      case 'silver':
-        minXp = 5000;
-        maxXp = 24999;
-        break;
-      case 'gold':
-        minXp = 25000;
-        maxXp = 99999;
-        break;
-      case 'platinum':
-        minXp = 100000;
-        maxXp = Infinity;
-        break;
+      case 'bronze': minXp = 0; maxXp = 4999; break;
+      case 'silver': minXp = 5000; maxXp = 24999; break;
+      case 'gold': minXp = 25000; maxXp = 99999; break;
+      case 'platinum': minXp = 100000; maxXp = Infinity; break;
     }
 
     let query = {
       'appPreferences.showOnLeaderboard': { $ne: false }
     };
     
-    if (category === 'xp') {
+    if (category === 'xp' || category === 'badges' || category === 'streaks') {
       if (minXp === 0) {
-        // Bronze league: Include users with 0 to 4999 XP, OR no XP at all
         query.$or = [
           { xp: { $gte: 0, $lte: maxXp } },
           { xp: { $exists: false } },
@@ -55,51 +42,49 @@ export async function GET(req) {
       }
     }
 
-    let sortConfig = { xp: -1 };
-
-    const topUsers = await User.find(query)
-      .sort(sortConfig)
-      .skip(offset)
-      .limit(limit)
-      .select('username avatarUrl xp activeColor activeBorder badges');
-      
-    const leaderboard = topUsers.map(u => ({
-      id: u._id,
+    // Fetch all matching users for accurate global ranking and sorting
+    const allUsers = await User.find(query).select('username avatarUrl xp activeColor activeBorder badges currentStreak _id');
+    
+    // Map to leaderboard objects
+    let leaderboard = allUsers.map(u => ({
+      id: u._id.toString(),
       name: u.username || 'Anonymous Athlete',
       avatar: u.avatarUrl || (u.username ? u.username[0].toUpperCase() : 'U'),
-      score: category === 'badges' ? (u.badges?.length || 0) : (u.xp || 0),
+      score: category === 'badges' ? (u.badges?.length || 0) : (category === 'streaks' ? (u.currentStreak || 0) : (u.xp || 0)),
       xp: u.xp || 0,
       activeColor: u.activeColor,
       activeBorder: u.activeBorder
     }));
 
-    if (category === 'badges') {
-      leaderboard.sort((a, b) => b.score - a.score);
-    }
+    // Sort globally
+    leaderboard.sort((a, b) => {
+      if (b.score !== a.score) return b.score - a.score;
+      // Tie breaker by XP if not sorting by XP
+      if (category !== 'xp' && b.xp !== a.xp) return b.xp - a.xp;
+      // Final tie breaker by ID
+      return a.id.localeCompare(b.id);
+    });
 
-    // Get the caller's true rank if they requested
+    // Assign global rank (handling ties if desired, but standard index + 1 is what the UI expects for now)
+    leaderboard.forEach((entry, index) => {
+      entry.globalRank = index + 1;
+    });
+
     const user = await import('@/lib/auth').then(m => m.getSessionUser());
     let myRank = null;
-    let myTotalCount = 0;
+    let myTotalCount = leaderboard.length;
     
-    if (user && offset === 0) {
-      myTotalCount = await User.countDocuments(query);
-      if (category === 'xp') {
-        const dbUser = await User.findById(user._id);
-        if (dbUser) {
-          const userXp = dbUser.xp || 0;
-          let higherUsersQuery = { ...query };
-          if (higherUsersQuery.$or) {
-             delete higherUsersQuery.$or;
-          }
-          higherUsersQuery.xp = { $gt: userXp };
-          const higherUsersCount = await User.countDocuments(higherUsersQuery);
-          myRank = higherUsersCount + 1;
-        }
+    if (user) {
+      const myEntry = leaderboard.find(e => e.id === user._id.toString());
+      if (myEntry) {
+        myRank = myEntry.globalRank;
       }
     }
 
-    return NextResponse.json({ leaderboard, myRank, totalCount: myTotalCount });
+    // Slice for pagination
+    const paginatedLeaderboard = leaderboard.slice(offset, offset + limit);
+
+    return NextResponse.json({ leaderboard: paginatedLeaderboard, myRank, totalCount: myTotalCount });
   } catch (error) {
     console.error('Leaderboard error:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

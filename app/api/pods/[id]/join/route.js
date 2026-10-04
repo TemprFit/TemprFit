@@ -18,6 +18,11 @@ export async function POST(req, { params }) {
     if (!pod) {
       return NextResponse.json({ error: 'Pod not found' }, { status: 404 });
     }
+    
+    const podStatus = pod.status || 'active';
+    if (podStatus !== 'active' || (pod.endDate && new Date() > new Date(pod.endDate))) {
+      return NextResponse.json({ error: 'This pod has ended and is no longer accepting members.' }, { status: 400 });
+    }
 
     const userIdStr = sessionUser._id.toString();
     const isMember = pod.members.some(id => id.toString() === userIdStr);

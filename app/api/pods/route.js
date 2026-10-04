@@ -4,23 +4,6 @@ import Pod from '@/models/Pod';
 import User from '@/models/User';
 import { getSessionUser } from '@/lib/auth';
 
-// Seed some default pods if none exist
-async function seedPods() {
-  const count = await Pod.countDocuments();
-  if (count === 0) {
-    await Pod.create([
-      { name: 'The Morning Club', description: 'Early risers and 5 AM lifters.', icon: 'Sun' },
-      { name: 'Iron Addicts', description: 'Heavy lifters and bodybuilders.', icon: 'Dumbbell' },
-      { name: 'Cardio Kings & Queens', description: 'Runners, cyclists, and HIIT enthusiasts.', icon: 'Activity' },
-      { name: 'Yoga & Flow', description: 'Flexibility, mobility, and mindfulness.', icon: 'Flame' },
-      { name: 'Beginner\'s Bootcamp', description: 'A safe space for newcomers to fitness.', icon: 'Shield' },
-      { name: 'Powerlifting Syndicate', description: 'Chasing the 1-rep max.', icon: 'Trophy' },
-      { name: 'Calisthenics Crew', description: 'Bodyweight masters.', icon: 'Zap' },
-      { name: 'Weekend Warriors', description: 'Those who crush it on Saturday and Sunday.', icon: 'Medal' },
-    ]);
-  }
-}
-
 export async function POST(req) {
   try {
     await connectDB();
@@ -31,39 +14,44 @@ export async function POST(req) {
     }
 
     const body = await req.json();
-    const { name, description, icon, customImage, image, rewardXP, rewardType, podType, rules } = body;
+    const { 
+      name, description, icon, image, isPrivate, joinCode,
+      rules, goalType, goalTarget, rewardPool, rewardType, durationDays 
+    } = body;
     
-    if (!name || !description || !icon) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    if (!name || !description) {
+      return NextResponse.json({ error: 'Name and description are required' }, { status: 400 });
     }
 
-    const parsedRewardXP = parseInt(rewardXP) || 0;
+    const parsedRewardPool = parseInt(rewardPool) || 0;
 
-    if (parsedRewardXP > 0) {
+    if (parsedRewardPool > 0) {
       const dbUser = await User.findById(user._id);
-      if (dbUser.xp < parsedRewardXP) {
+      if (dbUser.xp < parsedRewardPool) {
         return NextResponse.json({ error: 'Not enough XP to create this reward pool' }, { status: 400 });
       }
-      dbUser.xp -= parsedRewardXP;
+      dbUser.xp -= parsedRewardPool;
       await dbUser.save();
     }
 
-    const finalImage = image || customImage || null;
+    const endDate = new Date();
+    endDate.setDate(endDate.getDate() + (parseInt(durationDays) || 7));
 
     const newPod = await Pod.create({
       name,
       description,
-      icon,
-      customImage: finalImage,
-      podType: podType || 'standard',
+      icon: icon || 'Users',
+      image: image || null,
+      creator: user._id,
+      members: [user._id],
+      isPrivate: isPrivate || false,
+      joinCode: isPrivate ? (joinCode || Math.random().toString(36).substring(2, 8).toUpperCase()) : null,
       rules: rules || '',
-      challenge: {
-        rewardXP: parsedRewardXP,
-        rewardType: rewardType || 'multiple_winners',
-        targetVolume: 50000,
-        currentVolume: 0
-      },
-      members: [user._id] // creator automatically joins
+      goalType: goalType || 'volume_lifted',
+      goalTarget: parseInt(goalTarget) || 0,
+      rewardPool: parsedRewardPool,
+      rewardType: rewardType || 'pool_share',
+      endDate
     });
 
     return NextResponse.json({ success: true, pod: newPod });
@@ -82,21 +70,24 @@ export async function GET(req) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    await seedPods();
-
-    const pods = await Pod.find({});
+    const pods = await Pod.find({}).sort({ createdAt: -1 });
     
-    // Map pods to include 'joined' boolean, member count, and challenge
     const mapped = pods.map(p => ({
       id: p._id,
       name: p.name,
       description: p.description,
-      customImage: p.customImage,
       icon: p.icon,
-      challenge: p.challenge,
-      podType: p.podType,
+      image: p.image,
+      isPrivate: p.isPrivate,
+      creator: p.creator,
       rules: p.rules,
-      members: p.members.length,
+      goalType: p.goalType,
+      goalTarget: p.goalTarget,
+      rewardPool: p.rewardPool,
+      rewardType: p.rewardType,
+      endDate: p.endDate,
+      status: p.status,
+      membersCount: p.members.length,
       joined: p.members.some(id => id.toString() === user._id.toString())
     }));
 

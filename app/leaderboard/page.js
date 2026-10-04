@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Sidebar from '@/components/Sidebar';
+import UserAvatar from '@/components/UserAvatar';
 import styles from './page.module.css';
 
 export default function LeaderboardPage() {
@@ -17,6 +18,11 @@ export default function LeaderboardPage() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [leaderboard, setLeaderboard] = useState([]);
+
+  const formatNumber = (num) => {
+    if (num === null || num === undefined) return '0';
+    return new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 }).format(num);
+  };
 
   useEffect(() => {
     fetch('/api/auth/me')
@@ -114,7 +120,7 @@ export default function LeaderboardPage() {
               </div>
               <div style={{ textAlign: 'right' }}>
                 <div style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Your Total XP</div>
-                <div style={{ fontSize: '1.5rem', fontWeight: '800', color: '#10b981' }}>{user.xp?.toLocaleString()}</div>
+                <div title={`${user.xp?.toLocaleString()} XP`} style={{ fontSize: '1.5rem', fontWeight: '800', color: '#10b981', cursor: 'help' }}>{formatNumber(user.xp)}</div>
               </div>
             </div>
           )}
@@ -131,6 +137,12 @@ export default function LeaderboardPage() {
               style={{ padding: '8px 16px', borderRadius: '20px', border: 'none', fontWeight: '600', cursor: 'pointer', background: activeCategory === 'badges' ? 'var(--color-primary)' : 'rgba(255,255,255,0.1)', color: activeCategory === 'badges' ? '#fff' : 'var(--color-text-muted)' }}
             >
               Badge Collectors
+            </button>
+            <button 
+              onClick={() => setActiveCategory('streaks')} 
+              style={{ padding: '8px 16px', borderRadius: '20px', border: 'none', fontWeight: '600', cursor: 'pointer', background: activeCategory === 'streaks' ? 'var(--color-primary)' : 'rgba(255,255,255,0.1)', color: activeCategory === 'streaks' ? '#fff' : 'var(--color-text-muted)' }}
+            >
+              Streak Warriors
             </button>
           </div>
 
@@ -169,7 +181,9 @@ export default function LeaderboardPage() {
             <div className={styles.boardHeader}>
               <div>Rank</div>
               <div>Athlete</div>
-              <div style={{ textAlign: 'right' }}>{activeCategory === 'badges' ? 'Badges' : 'Total XP'}</div>
+              <div style={{ textAlign: 'right' }}>
+                {activeCategory === 'badges' ? 'Badges' : (activeCategory === 'streaks' ? 'Streak' : 'Total XP')}
+              </div>
             </div>
 
             <div className={styles.boardList}>
@@ -177,7 +191,7 @@ export default function LeaderboardPage() {
                 <div style={{ padding: '24px', textAlign: 'center', color: 'var(--color-text-muted)' }}>No athletes found in this category.</div>
               )}
               {leaderboard.map((entry, idx) => {
-                const rank = offset + idx + 1;
+                const rank = entry.globalRank || (offset + idx + 1);
                 let rankClass = '';
                 if (rank === 1) rankClass = styles.rank1;
                 if (rank === 2) rankClass = styles.rank2;
@@ -190,9 +204,11 @@ export default function LeaderboardPage() {
                     </div>
                     <Link href={`/u/${entry.name}`} style={{ display: 'flex', flex: 1, alignItems: 'center', textDecoration: 'none' }}>
                       <div className={styles.userCol}>
-                        <div className={`${styles.avatar} ${entry.activeBorder ? `aura-avatar-${entry.activeBorder}` : ''}`}>
-                          {entry.avatar}
-                        </div>
+                        <UserAvatar 
+                          user={{ avatarUrl: entry.avatar !== entry.name[0]?.toUpperCase() ? entry.avatar : '', username: entry.name, activeBorder: entry.activeBorder, activeColor: entry.activeColor }} 
+                          size="md" 
+                          disableLightbox={true} 
+                        />
                         <div className={styles.userName}>
                           <span style={{ color: entry.activeColor ? entry.activeColor : 'inherit' }}>
                             {entry.name}
@@ -201,12 +217,51 @@ export default function LeaderboardPage() {
                         </div>
                       </div>
                     </Link>
-                    <div className={styles.score} style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
-                      <span style={{ fontWeight: 800, color: '#fbbf24' }}>{entry.score.toLocaleString()} {activeCategory === 'badges' ? 'Badges' : 'XP'}</span>
+                    <div 
+                      className={styles.score} 
+                      title={`${entry.score?.toLocaleString()} ${activeCategory === 'badges' ? 'Badges' : (activeCategory === 'streaks' ? 'Days' : 'XP')}`}
+                      style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px', cursor: 'help' }}
+                    >
+                      <span style={{ fontWeight: 800, color: '#fbbf24' }}>
+                        {formatNumber(entry.score)} {activeCategory === 'badges' ? 'Badges' : (activeCategory === 'streaks' ? 'Days' : 'XP')}
+                      </span>
                     </div>
                   </div>
                 );
               })}
+              
+              {/* Pin the current user if they aren't in the loaded leaderboard */}
+              {myRankInfo && user && !leaderboard.some(e => e.isMe) && (
+                <div className={`${styles.boardRow} ${styles.isMe}`} style={{ borderTop: '2px dashed var(--color-border)', opacity: 0.9 }}>
+                  <div className={styles.rank}>
+                    #{myRankInfo.rank}
+                  </div>
+                  <Link href={`/u/${user.username || 'me'}`} style={{ display: 'flex', flex: 1, alignItems: 'center', textDecoration: 'none' }}>
+                    <div className={styles.userCol}>
+                      <UserAvatar 
+                        user={{ avatarUrl: user.avatarUrl, username: user.username, activeBorder: user.activeBorder, activeColor: user.activeColor }} 
+                        size="md" 
+                        disableLightbox={true} 
+                      />
+                      <div className={styles.userName}>
+                        <span style={{ color: user.activeColor ? user.activeColor : 'inherit' }}>
+                          {user.username || 'You'}
+                        </span>
+                        <span className={styles.isMeBadge}>You</span>
+                      </div>
+                    </div>
+                  </Link>
+                  <div 
+                    className={styles.score} 
+                    title={`${(activeCategory === 'badges' ? (user.badges?.length || 0) : (activeCategory === 'streaks' ? (user.currentStreak || 0) : (user.xp || 0))).toLocaleString()} ${activeCategory === 'badges' ? 'Badges' : (activeCategory === 'streaks' ? 'Days' : 'XP')}`}
+                    style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px', cursor: 'help' }}
+                  >
+                    <span style={{ fontWeight: 800, color: '#fbbf24' }}>
+                      {formatNumber(activeCategory === 'badges' ? (user.badges?.length || 0) : (activeCategory === 'streaks' ? (user.currentStreak || 0) : (user.xp || 0)))} {activeCategory === 'badges' ? 'Badges' : (activeCategory === 'streaks' ? 'Days' : 'XP')}
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
             
             {hasMore && leaderboard.length > 0 && (

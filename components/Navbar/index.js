@@ -222,7 +222,7 @@ export default function Navbar() {
             )}
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div className={styles.mobileActionsWrapper} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <div className={styles.desktopActions}>
             <div className={styles.searchWrapper}>
               <button 

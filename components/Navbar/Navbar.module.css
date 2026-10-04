@@ -35,7 +35,8 @@
   align-items: center;
   gap: 9px;
   text-decoration: none;
-  flex-shrink: 0;
+  flex-shrink: 1;
+  min-width: 0;
 }
 
 .logoMark {
@@ -93,7 +94,7 @@
 .searchBarBtn {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
   padding: 6px 10px 6px 12px;
   border-radius: 999px;
   background: var(--bg);
@@ -690,8 +691,8 @@
   background: transparent;
   border: none;
   flex-shrink: 0;
-  min-width: 44px;
-  min-height: 44px;
+  min-width: 34px;
+  min-height: 34px;
   align-items: center;
   justify-content: center;
 }
@@ -825,6 +826,9 @@
 }
 
 @media (max-width: 900px) {
+  .mobileActionsWrapper {
+    gap: 2px !important;
+  }
   .desktopNav {
     display: none;
   }
@@ -978,4 +982,12 @@
 
 .mobileToggleOn .mobileToggleKnob {
   transform: translateX(20px);
+}
+@media (max-width: 360px) {
+  .logoText {
+    display: none !important;
+  }
+  .navInner {
+    padding: 0 8px !important;
+  }
 }
