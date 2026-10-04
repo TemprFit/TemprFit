@@ -1,6 +1,5 @@
 'use client';
 
-import RoleGate from '@/components/RoleGate';
 import AdminSidebar from '@/components/AdminSidebar';
 import { usePathname } from 'next/navigation';
 
@@ -12,13 +11,12 @@ export default function AdminLayout({ children }) {
   }
 
   return (
-    <RoleGate allowedRoles={['admin']}>
-      <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--color-bg)' }}>
-        <AdminSidebar />
-        <main style={{ flex: 1, marginLeft: '250px', padding: '24px' }}>
-          {children}
-        </main>
-      </div>
-    </RoleGate>
+    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--color-bg)' }}>
+      <AdminSidebar />
+      <main style={{ flex: 1, marginLeft: '250px', padding: '24px' }}>
+        {children}
+      </main>
+    </div>
   );
 }
+

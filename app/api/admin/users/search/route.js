@@ -1,18 +1,17 @@
 import { NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
-import { getSessionUser , verifyAdminToken } from '@/lib/auth';
+import { verifyAdminRequest } from '@/lib/auth';
 import User from '@/models/User';
-import { cookies } from 'next/headers';
+
 export const dynamic = 'force-dynamic';
 
 export async function GET(req) {
   try {
     await connectDB();
-    const user = await getSessionUser();
+    const { authorized } = await verifyAdminRequest();
     
-    const isAdmin = (user && user.role === 'admin') || (await verifyAdminToken());
-  if (!isAdmin) {
-      return NextResponse.json({ error: 'Unauthorized. Admins only.' }, { status: 403 });
+    if (!authorized) {
+      return NextResponse.json({ error: 'Unauthorized: Admin access required.' }, { status: 403 });
     }
 
     const { searchParams } = new URL(req.url);

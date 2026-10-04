@@ -1,2 +1,1 @@
-﻿'use client';
-export default function SleepTracker() { return null; }
+export { default } from '../SleepTracker';

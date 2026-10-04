@@ -18,11 +18,14 @@ export default function AdminComplaints() {
     try {
       const res = await fetch('/api/admin/complaints');
       const data = await res.json();
-      if (data.complaints) {
+      if (data?.complaints && Array.isArray(data.complaints)) {
         setComplaints(data.complaints);
+      } else {
+        setComplaints([]);
       }
     } catch (e) {
       console.error(e);
+      setComplaints([]);
     } finally {
       setLoading(false);
     }

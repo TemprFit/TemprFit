@@ -1,2 +1,1 @@
-﻿'use client';
-export default function WaterTracker() { return null; }
+export { default } from '../WaterTracker';

@@ -1,16 +1,16 @@
 import { NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import Complaint from '@/models/Complaint';
-import { getSessionUser , verifyAdminToken } from '@/lib/auth';
-import { cookies } from 'next/headers';
+import User from '@/models/User';
+import { verifyAdminRequest } from '@/lib/auth';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET(req) {
   await connectDB();
-  const sessionUser = await getSessionUser();
-  const isAdminToken = (await verifyAdminToken());
-
-  if (!isAdminToken && (!sessionUser || sessionUser.role !== 'admin')) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+  const { authorized } = await verifyAdminRequest();
+  if (!authorized) {
+    return NextResponse.json({ error: 'Unauthorized: Admin access required.' }, { status: 403 });
   }
 
   try {

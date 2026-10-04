@@ -1,17 +1,15 @@
 import { NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
-import { getSessionUser , verifyAdminToken } from '@/lib/auth';
+import { verifyAdminRequest } from '@/lib/auth';
 import User from '@/models/User';
 import { BADGES } from '@/lib/badges';
-import { cookies } from 'next/headers';
 
 export async function POST(req) {
   try {
     await connectDB();
-    const admin = await getSessionUser();
+    const { authorized } = await verifyAdminRequest();
     
-    const isAdmin = (admin && admin.role === 'admin') || (await verifyAdminToken());
-  if (!isAdmin) {
+    if (!authorized) {
       return NextResponse.json({ error: 'Unauthorized. Admins only.' }, { status: 403 });
     }
 

@@ -21,10 +21,10 @@ describe('lib/auth.js Core Cryptography & Constants', () => {
       assert.equal(AUTH_COOKIE_NAME, 'repily_token');
     });
 
-    it('AUTH_COOKIE_MAX_AGE should be exactly 10 years in seconds (legacy baseline)', () => {
-      const TEN_YEARS_SECONDS = 60 * 60 * 24 * 365 * 10;
-      assert.equal(AUTH_COOKIE_MAX_AGE, TEN_YEARS_SECONDS);
-      assert.equal(AUTH_COOKIE_MAX_AGE, 315360000);
+    it('AUTH_COOKIE_MAX_AGE should be exactly 30 days in seconds per D-4', () => {
+      const THIRTY_DAYS_SECONDS = 60 * 60 * 24 * 30;
+      assert.equal(AUTH_COOKIE_MAX_AGE, THIRTY_DAYS_SECONDS);
+      assert.equal(AUTH_COOKIE_MAX_AGE, 2592000);
     });
   });
 

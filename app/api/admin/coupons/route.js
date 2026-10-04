@@ -1,12 +1,18 @@
 import { NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import CouponCode from '@/models/CouponCode';
+import { verifyAdminRequest } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
 // List all coupons
 export async function GET() {
   await connectDB();
+  const { authorized } = await verifyAdminRequest();
+  if (!authorized) {
+    return NextResponse.json({ error: 'Unauthorized: Admin access required.' }, { status: 403 });
+  }
+
   const coupons = await CouponCode.find().sort({ createdAt: -1 }).lean();
   return NextResponse.json({ coupons });
 }
@@ -14,6 +20,11 @@ export async function GET() {
 // Create a new coupon
 export async function POST(req) {
   await connectDB();
+  const { authorized } = await verifyAdminRequest();
+  if (!authorized) {
+    return NextResponse.json({ error: 'Unauthorized: Admin access required.' }, { status: 403 });
+  }
+
   const { code, planLevel, expiresInDays } = await req.json();
   if (!code || !planLevel) {
     return NextResponse.json({ error: 'code and planLevel required' }, { status: 400 });
@@ -43,6 +54,11 @@ export async function POST(req) {
 // Toggle coupon active/inactive
 export async function PATCH(req) {
   await connectDB();
+  const { authorized } = await verifyAdminRequest();
+  if (!authorized) {
+    return NextResponse.json({ error: 'Unauthorized: Admin access required.' }, { status: 403 });
+  }
+
   const { couponId, isActive } = await req.json();
   if (!couponId) return NextResponse.json({ error: 'couponId required' }, { status: 400 });
 

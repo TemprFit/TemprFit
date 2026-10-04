@@ -40,9 +40,12 @@ export default function AdminSidebar() {
   }, []);
 
   const handleLogout = async () => {
-    // Admins log out by clearing the token and returning to normal dashboard
-    document.cookie = "admin_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    window.location.href = '/dashboard';
+    try {
+      await fetch('/api/auth/admin/logout', { method: 'POST' });
+    } catch (e) {
+      console.error('Logout error:', e);
+    }
+    window.location.href = '/admin/login';
   };
 
   const menuItems = [

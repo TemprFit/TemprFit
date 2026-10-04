@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "next lint",
     "seed": "node scripts/seed-exercises.mjs",
-    "test": "node --no-warnings --import ./tests/register.js --test \"tests/**/*.test.js\""
+    "test": "node --no-warnings --import ./tests/register.js --test \"tests/**/*.test.js\"",
+    "emit-contracts": "node --no-warnings tools/emit-contract.js",
+    "check:contracts": "npm run emit-contracts && git diff --exit-code contracts/v1/"
   },
   "dependencies": {
     "@ducanh2912/next-pwa": "^10.2.9",
@@ -35,11 +37,13 @@
     "react-dom": "^18.3.1",
     "react-hot-toast": "^2.6.1",
     "recharts": "^2.12.7",
-    "resend": "^6.28.1"
+    "resend": "^6.28.1",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@netlify/plugin-nextjs": "^5.16.0",
     "eslint": "^8.57.0",
-    "eslint-config-next": "^14.2.5"
+    "eslint-config-next": "^14.2.5",
+    "zod-to-json-schema": "^3.25.2"
   }
 }

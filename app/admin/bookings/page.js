@@ -60,15 +60,15 @@ export default function AdminBookings() {
                   <td style={{ padding: '16px' }}>{new Date(b.createdAt).toLocaleDateString()}</td>
                   <td style={{ padding: '16px', fontWeight: 600 }}>{b.trainee?.username || 'Unknown'}</td>
                   <td style={{ padding: '16px', fontWeight: 600, color: '#3b82f6' }}>{b.trainer?.username || 'Unknown'}</td>
-                  <td style={{ padding: '16px', color: 'var(--color-text-muted)' }}>{b.program?.title || 'Custom'}</td>
-                  <td style={{ padding: '16px' }}>${b.amountPaid.toFixed(2)}</td>
+                  <td style={{ padding: '16px', color: 'var(--color-text-muted)' }}>{b.program?.title || b.description || 'Custom'}</td>
+                  <td style={{ padding: '16px' }}>${(typeof b.amountPaid === 'number' ? b.amountPaid : (typeof b.amount === 'number' ? b.amount : 0)).toFixed(2)}</td>
                   <td style={{ padding: '16px' }}>
                     <span style={{ 
                       padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 600, textTransform: 'capitalize',
-                      background: b.status === 'held' ? 'rgba(245, 158, 11, 0.1)' : b.status === 'released' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-                      color: b.status === 'held' ? '#f59e0b' : b.status === 'released' ? '#22c55e' : '#ef4444'
+                      background: (b.status === 'held' || b.escrowStatus === 'held') ? 'rgba(245, 158, 11, 0.1)' : (b.status === 'released' || b.status === 'completed' || b.escrowStatus === 'released') ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                      color: (b.status === 'held' || b.escrowStatus === 'held') ? '#f59e0b' : (b.status === 'released' || b.status === 'completed' || b.escrowStatus === 'released') ? '#22c55e' : '#ef4444'
                     }}>
-                      {b.status}
+                      {b.status || b.escrowStatus || 'pending'}
                     </span>
                   </td>
                 </tr>

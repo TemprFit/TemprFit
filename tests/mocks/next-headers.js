@@ -1,6 +1,7 @@
 // Mock implementation of next/headers for test execution
 
 let mockCookies = new Map();
+let mockHeaders = new Headers();
 
 export function setMockCookies(cookieObj) {
   mockCookies = new Map(Object.entries(cookieObj));
@@ -8,6 +9,14 @@ export function setMockCookies(cookieObj) {
 
 export function clearMockCookies() {
   mockCookies = new Map();
+}
+
+export function setMockHeaders(headersObj) {
+  mockHeaders = new Headers(headersObj);
+}
+
+export function clearMockHeaders() {
+  mockHeaders = new Headers();
 }
 
 export function cookies() {
@@ -26,5 +35,5 @@ export function cookies() {
 }
 
 export function headers() {
-  return new Headers();
+  return mockHeaders;
 }

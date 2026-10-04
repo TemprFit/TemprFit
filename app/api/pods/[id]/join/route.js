@@ -1,15 +1,14 @@
 import { NextResponse } from 'next/server';
-import { getSessionUser } from '@/lib/auth';
+
 import { connectDB } from '@/lib/db';
+import { getSessionUser } from '@/lib/auth';
 import Pod from '@/models/Pod';
 
 export async function POST(req, { params }) {
   try {
     await connectDB();
-    
-    const user = await getSessionUser();
-    
-    if (!user) {
+    const sessionUser = await getSessionUser();
+    if (!sessionUser) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -20,14 +19,15 @@ export async function POST(req, { params }) {
       return NextResponse.json({ error: 'Pod not found' }, { status: 404 });
     }
 
-    const isMember = pod.members.some(id => id.toString() === user._id.toString());
+    const userIdStr = sessionUser._id.toString();
+    const isMember = pod.members.some(id => id.toString() === userIdStr);
 
     if (isMember) {
       // Leave pod
-      pod.members = pod.members.filter(id => id.toString() !== user._id.toString());
+      pod.members = pod.members.filter(id => id.toString() !== userIdStr);
     } else {
       // Join pod
-      pod.members.push(user._id);
+      pod.members.push(sessionUser._id);
     }
 
     await pod.save();

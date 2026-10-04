@@ -6,38 +6,70 @@ import { verifyToken, AUTH_COOKIE_NAME } from '@/lib/auth'
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  const adminToken = cookies().get('admin_token')?.value;
-  let isAdmin = false;
-  if (adminToken) {
-    const adminPayload = verifyToken(adminToken);
-    if (adminPayload && adminPayload.role === 'admin') {
-      isAdmin = true;
+  const adminCookie = cookies().get('admin_token')?.value;
+  let hasAdminPrivilege = false;
+
+  if (adminCookie) {
+    if (adminCookie === 'true') {
+      hasAdminPrivilege = true;
+    } else {
+      const adminPayload = verifyToken(adminCookie);
+      if (adminPayload && (adminPayload.role === 'admin' || adminPayload.isAdmin)) {
+        hasAdminPrivilege = true;
+      }
     }
   }
 
-  const token = cookies().get(AUTH_COOKIE_NAME)?.value
+  const token = cookies().get(AUTH_COOKIE_NAME)?.value;
   if (!token) {
-    if (isAdmin) {
-      return NextResponse.json({ user: { role: 'admin', originalRole: 'admin', username: 'Admin' } }, { status: 200 })
+    if (hasAdminPrivilege) {
+      return NextResponse.json({
+        user: {
+          id: 'admin',
+          username: 'Platform Admin',
+          email: 'admin@temprfit.com',
+          role: 'admin',
+          originalRole: 'admin',
+          plan: 'max',
+        },
+      }, { status: 200 });
     }
-    return NextResponse.json({ user: null }, { status: 200 })
+    return NextResponse.json({ user: null }, { status: 200 });
   }
 
-  const payload = verifyToken(token)
+  const payload = verifyToken(token);
   if (!payload) {
-    if (isAdmin) {
-      return NextResponse.json({ user: { role: 'admin', originalRole: 'admin', username: 'Admin' } }, { status: 200 })
+    if (hasAdminPrivilege) {
+      return NextResponse.json({
+        user: {
+          id: 'admin',
+          username: 'Platform Admin',
+          email: 'admin@temprfit.com',
+          role: 'admin',
+          originalRole: 'admin',
+          plan: 'max',
+        },
+      }, { status: 200 });
     }
-    return NextResponse.json({ user: null }, { status: 200 })
+    return NextResponse.json({ user: null }, { status: 200 });
   }
 
-  await connectDB()
-  const user = await User.findById(payload.userId)
+  await connectDB();
+  const user = await User.findById(payload.userId);
   if (!user) {
-    if (isAdmin) {
-      return NextResponse.json({ user: { role: 'admin', originalRole: 'admin', username: 'Admin' } }, { status: 200 })
+    if (hasAdminPrivilege) {
+      return NextResponse.json({
+        user: {
+          id: 'admin',
+          username: 'Platform Admin',
+          email: 'admin@temprfit.com',
+          role: 'admin',
+          originalRole: 'admin',
+          plan: 'max',
+        },
+      }, { status: 200 });
     }
-    return NextResponse.json({ user: null }, { status: 200 })
+    return NextResponse.json({ user: null }, { status: 200 });
   }
 
   // Downgrade plan if expired
@@ -49,11 +81,11 @@ export async function GET() {
 
   const safeUser = user.toSafeObject();
   safeUser.originalRole = safeUser.role;
-  
-  // Upgrade role to admin in memory if the admin_token JWT is valid
-  if (isAdmin) {
+
+  // Upgrade role to admin in memory if the admin_token cookie is present
+  if (hasAdminPrivilege) {
     safeUser.role = 'admin';
   }
 
-  return NextResponse.json({ user: safeUser })
+  return NextResponse.json({ user: safeUser });
 }

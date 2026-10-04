@@ -2,18 +2,15 @@ import { NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import User from '@/models/User';
 import bcrypt from 'bcryptjs';
-import { getSessionUser , verifyAdminToken } from '@/lib/auth';
-import { cookies } from 'next/headers';
+import { verifyAdminRequest } from '@/lib/auth';
 
 export async function POST(req, { params }) {
   await connectDB();
   
   // Verify Admin
-  const sessionUser = await getSessionUser();
-  const isAdminToken = (await verifyAdminToken());
-
-  if (!isAdminToken && (!sessionUser || sessionUser.role !== 'admin')) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+  const { authorized } = await verifyAdminRequest();
+  if (!authorized) {
+    return NextResponse.json({ error: 'Unauthorized: Admin access required.' }, { status: 403 });
   }
 
   try {
@@ -40,6 +37,10 @@ export async function POST(req, { params }) {
       targetUser.avatarUrl = avatarUrl;
     }
 
+    if (plan && ['free', 'pro', 'max'].includes(plan)) {
+      targetUser.plan = plan;
+    }
+
     if (password && password.trim() !== '') {
       const salt = await bcrypt.genSalt(10);
       targetUser.password = await bcrypt.hash(password, salt);
@@ -50,7 +51,8 @@ export async function POST(req, { params }) {
     return NextResponse.json({ success: true, message: 'User updated successfully', user: {
       _id: targetUser._id,
       username: targetUser.username,
-      avatarUrl: targetUser.avatarUrl
+      avatarUrl: targetUser.avatarUrl,
+      plan: targetUser.plan
     } });
   } catch (error) {
     console.error('Admin user edit error:', error);

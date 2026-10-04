@@ -1,2 +1,1 @@
-﻿'use client';
-export default function XPTransferWidget() { return null; }
+export { default } from '../XPTransferWidget';
