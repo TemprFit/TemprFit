@@ -6,9 +6,11 @@ import Image from 'next/image';
 import AIResponseRenderer from '@/components/AIResponseRenderer';
 import styles from './AIModal.module.css';
 
-export default function AIModal({ isOpen, onClose }) {
+export default function AIModal({ isOpen, onClose, initialMessage }) {
+  useEffect(() => { if (initialMessage) { setMessages([{ role: 'ai', text: initialMessage }]); } }, [initialMessage]);
+
   const [messages, setMessages] = useState([
-    { role: 'ai', text: 'Hello! I am your TemprFit AI Coach. How can I help you today?' },
+    { role: 'ai', text: initialMessage || 'Hello! I am your TemprFit AI Coach. How can I help you today?' },
   ]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);

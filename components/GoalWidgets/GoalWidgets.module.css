@@ -35,10 +35,7 @@
   font-size: 1.1rem;
 }
 
-.sideWidgets {
-  display: flex;
-  gap: 16px;
-}
+.sideWidgets { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 16px; }
 
 .smallWidget {
   background: var(--color-surface-elevated);

@@ -41,7 +41,7 @@ export default function XPTransferWidget({ user, onTransferSuccess }) {
   return (
     <div style={{ background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border)', borderRadius: '16px', padding: '24px' }}>
       <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: '0 0 16px 0', fontSize: '1.2rem' }}>
-        <Zap size={20} color="#fbbf24" /> Share XP
+        <Zap size={20} color="#22c55e" /> Share XP
       </h3>
       <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', marginBottom: '16px' }}>
         Gift your XP to friends to help them rank up!
@@ -69,7 +69,7 @@ export default function XPTransferWidget({ user, onTransferSuccess }) {
         <button 
           type="submit" 
           disabled={loading || !recipient || !amount}
-          style={{ background: '#fbbf24', color: '#000', border: 'none', borderRadius: '8px', padding: '0 16px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px', cursor: (loading || !recipient || !amount) ? 'not-allowed' : 'pointer', opacity: (loading || !recipient || !amount) ? 0.6 : 1 }}
+          style={{ background: '#22c55e', color: '#000', border: 'none', borderRadius: '8px', padding: '0 16px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px', cursor: (loading || !recipient || !amount) ? 'not-allowed' : 'pointer', opacity: (loading || !recipient || !amount) ? 0.6 : 1 }}
         >
           <Send size={16} /> {loading ? 'Sending...' : 'Send'}
         </button>

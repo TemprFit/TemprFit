@@ -3,6 +3,7 @@ import { connectDB } from '@/lib/db';
 import User from '@/models/User';
 import WorkoutSession from '@/models/WorkoutSession';
 import Pod from '@/models/Pod';
+import Moment from '@/models/Moment';
 
 export async function GET(req, { params }) {
   try {
@@ -14,7 +15,9 @@ export async function GET(req, { params }) {
       .select('username avatarUrl activeColor activeBorder xp checkInStreak totalCheckInStreak longestCheckInStreak currentStreak longestStreak plan badges age sex fitnessProfile createdAt');
       
     if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      const userMoments = await Moment.find({ user: user._id }).sort({ createdAt: -1 }).limit(10);
+
+    return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
     // Aggregate total volume from completed workouts
@@ -31,7 +34,8 @@ export async function GET(req, { params }) {
     return NextResponse.json({ 
       user,
       stats,
-      pods: userPods
+      pods: userPods,
+      moments: userMoments
     });
   } catch (error) {
     console.error('User profile fetch error:', error);

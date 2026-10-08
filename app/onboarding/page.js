@@ -24,6 +24,38 @@ const EXPERIENCES = [
   { id: 'advanced', title: 'Advanced', desc: '3+ years of serious training' },
 ];
 
+
+const COUNTRIES = [
+  { name: 'United States', code: '+1' },
+  { name: 'United Kingdom', code: '+44' },
+  { name: 'Canada', code: '+1' },
+  { name: 'Australia', code: '+61' },
+  { name: 'Germany', code: '+49' },
+  { name: 'France', code: '+33' },
+  { name: 'Nigeria', code: '+234' },
+  { name: 'South Africa', code: '+27' },
+  { name: 'India', code: '+91' },
+  { name: 'Brazil', code: '+55' },
+  { name: 'Japan', code: '+81' },
+  { name: 'China', code: '+86' },
+  { name: 'Mexico', code: '+52' },
+  { name: 'Spain', code: '+34' },
+  { name: 'Italy', code: '+39' },
+  { name: 'Netherlands', code: '+31' },
+  { name: 'Sweden', code: '+46' },
+  { name: 'Switzerland', code: '+41' },
+  { name: 'New Zealand', code: '+64' },
+  { name: 'Singapore', code: '+65' },
+  { name: 'United Arab Emirates', code: '+971' },
+  { name: 'Saudi Arabia', code: '+966' },
+  { name: 'Argentina', code: '+54' },
+  { name: 'Colombia', code: '+57' },
+  { name: 'Egypt', code: '+20' },
+  { name: 'Kenya', code: '+254' },
+  { name: 'Ghana', code: '+233' },
+  { name: 'Other', code: '' }
+];
+
 export default function OnboardingPage() {
   const router = useRouter();
   const [step, setStep] = useState(1);
@@ -33,6 +65,7 @@ export default function OnboardingPage() {
   const [data, setData] = useState({
     nickname: '',
     country: '',
+    city: '',
     primaryGoal: 'fat_loss',
     experienceLevel: 'beginner',
     workoutContext: {
@@ -76,7 +109,7 @@ export default function OnboardingPage() {
     setLoading(true);
     try {
       const payload = {
-        fitnessProfile: data,
+        fitnessProfile: { ...data, country: data.country === "Other" ? data.customCountry : data.country, fullPhoneNumber: data.phoneCode + data.phoneNumber },
         hasCompletedOnboarding: true
       };
       
@@ -116,11 +149,68 @@ export default function OnboardingPage() {
               </div>
               <div className={styles.inputGroup}>
                 <label>Country</label>
+                <select 
+                  value={data.country}
+                  onChange={e => {
+                    const selected = e.target.value;
+                    const countryObj = COUNTRIES.find(c => c.name === selected);
+                    updateData(null, 'country', selected);
+                    if (countryObj && countryObj.code) {
+                      updateData(null, 'phoneCode', countryObj.code);
+                    } else if (selected !== 'Other') {
+                      updateData(null, 'phoneCode', '');
+                    }
+                  }}
+                >
+                  <option value="">Select a country...</option>
+                  {COUNTRIES.map(c => (
+                    <option key={c.name} value={c.name}>{c.name}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {data.country === 'Other' && (
+              <div className={styles.row}>
+                <div className={styles.inputGroup} style={{ gridColumn: '1 / -1' }}>
+                  <label>Type your country</label>
+                  <input 
+                    type="text" 
+                    placeholder="Enter your country name"
+                    value={data.customCountry}
+                    onChange={e => updateData(null, 'customCountry', e.target.value)}
+                  />
+                </div>
+              </div>
+            )}
+
+            <div className={styles.row}>
+              <div className={styles.inputGroup}>
+                <label>Phone Number</label>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <input 
+                    type="text" 
+                    placeholder="+Code"
+                    value={data.phoneCode}
+                    onChange={e => updateData(null, 'phoneCode', e.target.value)}
+                    style={{ width: '80px', textAlign: 'center' }}
+                  />
+                  <input 
+                    type="tel" 
+                    placeholder="e.g. 234 567 8900"
+                    value={data.phoneNumber}
+                    onChange={e => updateData(null, 'phoneNumber', e.target.value)}
+                    style={{ flex: 1 }}
+                  />
+                </div>
+              </div>
+              <div className={styles.inputGroup}>
+                <label>City / Location</label>
                 <input 
                   type="text" 
-                  placeholder="e.g. United States"
-                  value={data.country}
-                  onChange={e => updateData(null, 'country', e.target.value)}
+                  placeholder="e.g. New York, NY"
+                  value={data.city}
+                  onChange={e => updateData(null, 'city', e.target.value)}
                 />
               </div>
             </div>
@@ -302,7 +392,7 @@ export default function OnboardingPage() {
   };
 
   const isStepValid = () => {
-    if (step === 1) return data.nickname && data.country;
+    if (step === 1) return data.nickname && data.country && data.phoneNumber;
     if (step === 5) {
       const { age, biologicalSex, heightCm, currentWeightKg, targetWeightKg } = data.bodyMetrics;
       if (data.primaryGoal !== 'general_health' && !targetWeightKg) return false;

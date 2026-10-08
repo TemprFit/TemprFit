@@ -16,7 +16,7 @@ function WellnessWidgets() {
         </div>
       </div>
       <div className={styles.smallWidget}>
-        <h4><Moon size={16} color="#a855f7" /> Sleep</h4>
+        <h4><Moon size={16} color="#22c55e" /> Sleep</h4>
         <div className={styles.widgetVal}>7.5 <span style={{fontSize: '0.8rem', color: 'var(--color-text-muted)'}}>hrs</span></div>
       </div>
     </>
@@ -188,7 +188,7 @@ export function RecompDashboard({ user, stats }) {
         </div>
         <div className={styles.smallWidget}>
           <h4>Consistency</h4>
-          <div className={styles.widgetVal} style={{color: '#a855f7'}}>{Math.max(stats?.currentStreak || 0, user?.totalCheckInStreak || 0)}d <span style={{fontSize: '0.8rem', color: 'var(--color-text-muted)'}}>streak</span></div>
+          <div className={styles.widgetVal} style={{color: '#22c55e'}}>{Math.max(stats?.currentStreak || 0, user?.totalCheckInStreak || 0)}d <span style={{fontSize: '0.8rem', color: 'var(--color-text-muted)'}}>streak</span></div>
         </div>
         <WellnessWidgets />
       </div>

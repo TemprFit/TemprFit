@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
 import UserAvatar from '@/components/UserAvatar';
 import { BADGES } from '@/lib/badges';
-import { Activity, Flame, Medal, Star, Trophy, MapPin, User as UserIcon, Target, Users } from 'lucide-react';
+import { Activity, Flame, Medal, Star, Trophy, MapPin, User as UserIcon, Target, Users, Image as ImageIcon } from 'lucide-react';
 import Link from 'next/link';
 import styles from './page.module.css';
 
@@ -16,6 +16,7 @@ export default function UserProfilePage() {
   const [profile, setProfile] = useState(null);
   const [stats, setStats] = useState(null);
   const [pods, setPods] = useState([]);
+  const [moments, setMoments] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -26,6 +27,7 @@ export default function UserProfilePage() {
           setProfile(data.user);
           setStats(data.stats);
           setPods(data.pods || []);
+          setMoments(data.moments || []);
         }
         setLoading(false);
       })

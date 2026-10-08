@@ -63,6 +63,20 @@ export default function TDEECalculatorPage() {
       surplus: tdee + 300,
       protein: Math.round(w * 2),
     });
+
+    // Auto-save to tracker
+    fetch('/api/bmi', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        weight: w,
+        height: h,
+        bmi: parseFloat(bmi.toFixed(1)),
+        category: bmiCat.label,
+        advice: 'TDEE calculated: ' + tdee + ' kcal. Deficit target: ' + (tdee - 500) + ' kcal.',
+        date: new Date().toISOString()
+      })
+    }).catch(console.error);
   };
 
   return (

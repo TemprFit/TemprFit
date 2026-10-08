@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { connectDB } from '@/lib/db'
 import { getSessionUser } from '@/lib/auth'
+import User from '@/models/User'
 
 // Called once by the dashboard right after it renders the "Welcome to your
 // new dashboard" message for a brand-new account. Flipping this server-side
@@ -12,8 +13,7 @@ export async function POST() {
   if (!user) return NextResponse.json({ error: 'Sign in required.' }, { status: 401 })
 
   if (!user.firstLoginCompleted) {
-    user.firstLoginCompleted = true
-    await user.save()
+    await User.findByIdAndUpdate(user._id, { firstLoginCompleted: true });
   }
 
   return NextResponse.json({ ok: true })

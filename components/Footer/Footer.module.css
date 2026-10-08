@@ -28,12 +28,7 @@
   color: #22c55e;
 }
 
-.brandAccent {
-  background: linear-gradient(135deg, #22c55e, #06b6d4);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
+.brandAccent { color: #22c55e; }
 
 .brandDesc {
   color: var(--color-text-muted);

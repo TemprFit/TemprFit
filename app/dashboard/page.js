@@ -246,7 +246,7 @@ export default function Dashboard() {
               </div>
             </div>
             <div className={styles.qsCard}>
-              <div className={styles.qsIcon} style={{ background: 'rgba(168,85,247,0.1)', color: '#a855f7' }}>
+              <div className={styles.qsIcon} style={{ background: 'rgba(34,197,94,0.1)', color: '#22c55e' }}>
                 <Trophy size={22} />
               </div>
               <div>
@@ -267,13 +267,13 @@ export default function Dashboard() {
 
           <div className={styles.chartsRow} data-tour="tour-charts">
             <ChartWidget
-              data={stats ? stats.weeklyVolume : Array(8).fill({ value: 0 })}
+              data={(stats && stats.weeklyVolume) ? stats.weeklyVolume : Array(8).fill({ value: 0 })}
               type="bar"
               title="Weekly Volume (last 8 weeks)"
               color="#22c55e"
             />
             <ChartWidget
-              data={stats && stats.strengthTrend.length > 1 ? stats.strengthTrend : Array(8).fill({ value: 0 })}
+              data={(stats && stats.strengthTrend && stats.strengthTrend.length > 1) ? stats.strengthTrend : Array(8).fill({ value: 0 })}
               type="line"
               title={stats?.targetExercise ? `Est. 1RM — ${stats.targetExercise.name}` : 'Strength Progress'}
               color="#06b6d4"
@@ -357,9 +357,11 @@ export default function Dashboard() {
 
           {/* Gamification: Badges Showcase */}
           <div className={styles.goalsSection} style={{ marginTop: '30px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-              <h3 className={styles.sectionTitle} style={{ marginBottom: 0 }}>Achievements & Badges</h3>
-              <Link href="/badges" style={{ color: '#22c55e', fontSize: '0.9rem', fontWeight: 600 }}>See All / Shop &rarr;</Link>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <h2 style={{ fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Star size={20} color="#22c55e" /> Achievements & Badges
+              </h2>
+              <Link href="/badges" style={{ color: '#22c55e', fontSize: '0.9rem', fontWeight: 600 }}>See All &rarr;</Link>
             </div>
             <div className={styles.badgesGrid}>
               <div className={`${styles.badgeCard} ${stats?.totalSessions >= 1 ? styles.badgeUnlocked : styles.badgeLocked}`}>
@@ -465,7 +467,7 @@ export default function Dashboard() {
 
         </div>
       </div>
-      <AIModal isOpen={aiOpen} onClose={() => setAiOpen(false)} />
+      <AIModal isOpen={aiOpen} onClose={() => setAiOpen(false)} initialMessage={showFirstWelcome ? `Hey ${user?.nickname || user?.username || "there"}! I have analyzed your fitness profile. Are you ready for me to build your first routine?` : null} />
       <MysteryBoxModal 
         isOpen={showMysteryBox} 
         onClose={() => setShowMysteryBox(false)} 
